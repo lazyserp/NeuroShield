@@ -9,14 +9,20 @@
 <body>
     <div class="container">
         <h1>NeuroShield 🛡️</h1>
-        <p class="subtitle">Protect your photos from AI manipulation.</p>
+        <p class="subtitle">Universal Image Immunization Interface</p>
+
+        <div class="settings-box">
+            <label for="apiUrl">🔌 Server URL:</label>
+            <input type="text" id="apiUrl" placeholder="Paste Ngrok URL here (e.g., https://xyz.ngrok...)" value="http://127.0.0.1:8000">
+            <span class="status-dot" id="connectionStatus" title="Disconnected"></span>
+        </div>
 
         <div class="upload-section">
             <input type="file" id="fileInput" accept="image/*">
             <button onclick="uploadImage()" id="protectBtn">Immunize Image</button>
         </div>
 
-        <div id="status" class="hidden">Processing... (This uses GPU, please wait)</div>
+        <div id="status" class="hidden">Processing... (Engine is calculating)</div>
 
         <div class="result-section" id="resultSection">
             <div class="image-box">
@@ -32,13 +38,29 @@
     </div>
 
     <script>
-        // CHANGE THIS URL if using Ngrok (e.g., "https://xyz.ngrok-free.app")
-        const API_URL = "https://mathilda-uninitialled-unstridently.ngrok-free.dev"; 
-
         const fileInput = document.getElementById('fileInput');
         const protectBtn = document.getElementById('protectBtn');
         const status = document.getElementById('status');
         const resultSection = document.getElementById('resultSection');
+        const apiUrlInput = document.getElementById('apiUrl');
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        // Check connection when URL changes
+        apiUrlInput.addEventListener('input', checkConnection);
+        
+        async function checkConnection() {
+            let url = apiUrlInput.value.replace(/\/$/, ""); // Remove trailing slash
+            try {
+                const res = await fetch(`${url}/`);
+                if (res.ok) {
+                    connectionStatus.style.backgroundColor = "#4ade80"; // Green
+                    connectionStatus.title = "Connected";
+                }
+            } catch (e) {
+                connectionStatus.style.backgroundColor = "#ef4444"; // Red
+                connectionStatus.title = "Disconnected";
+            }
+        }
 
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -50,21 +72,25 @@
         async function uploadImage() {
             const file = fileInput.files[0];
             if (!file) return alert("Please select an image first!");
+            
+            // Get URL from the input box
+            let baseUrl = apiUrlInput.value.replace(/\/$/, "");
+            if (!baseUrl) return alert("Please enter the Server URL!");
 
             protectBtn.disabled = true;
             status.style.display = 'block';
-            status.innerText = "Initializing NeuroShield Core...";
+            status.innerText = "Sending to Engine...";
 
             const formData = new FormData();
             formData.append("file", file);
 
             try {
-                const response = await fetch(`${API_URL}/immunize`, {
+                const response = await fetch(`${baseUrl}/immunize`, {
                     method: "POST",
                     body: formData
                 });
 
-                if (!response.ok) throw new Error("Processing failed");
+                if (!response.ok) throw new Error("Server Error");
 
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);

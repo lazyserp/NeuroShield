@@ -69,4 +69,32 @@ button:disabled { background-color: #475569; cursor: not-allowed; }
     border-radius: 4px;
 }
 
+.settings-box {
+    background: #334155;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.settings-box input {
+    background: #1e293b;
+    border: 1px solid #475569;
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    flex-grow: 1;
+}
+
+.status-dot {
+    height: 10px;
+    width: 10px;
+    background-color: #ef4444; /* Default Red */
+    border-radius: 50%;
+    display: inline-block;
+}
+
 .hidden { display: none; }
