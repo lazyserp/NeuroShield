@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroShield | AI Image Immunizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>NeuroShield 🛡️</h1>
+        <p class="subtitle">Protect your photos from AI manipulation.</p>
+
+        <div class="upload-section">
+            <input type="file" id="fileInput" accept="image/*">
+            <button onclick="uploadImage()" id="protectBtn">Immunize Image</button>
+        </div>
+
+        <div id="status" class="hidden">Processing... (This uses GPU, please wait)</div>
+
+        <div class="result-section" id="resultSection">
+            <div class="image-box">
+                <h3>Original</h3>
+                <img id="originalPreview" src="" alt="Original">
+            </div>
+            <div class="image-box">
+                <h3>Protected</h3>
+                <img id="protectedPreview" src="" alt="Protected">
+                <a id="downloadLink" href="#" download="protected.png" class="btn-download">Download</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CHANGE THIS URL if using Ngrok (e.g., "https://xyz.ngrok-free.app")
+        const API_URL = "http://127.0.0.1:8000"; 
+
+        const fileInput = document.getElementById('fileInput');
+        const protectBtn = document.getElementById('protectBtn');
+        const status = document.getElementById('status');
+        const resultSection = document.getElementById('resultSection');
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('originalPreview').src = URL.createObjectURL(file);
+            }
+        });
+
+        async function uploadImage() {
+            const file = fileInput.files[0];
+            if (!file) return alert("Please select an image first!");
+
+            protectBtn.disabled = true;
+            status.style.display = 'block';
+            status.innerText = "Initializing NeuroShield Core...";
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch(`${API_URL}/immunize`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error("Processing failed");
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                
+                document.getElementById('protectedPreview').src = url;
+                document.getElementById('downloadLink').href = url;
+                resultSection.style.display = 'flex';
+                status.style.display = 'none';
+
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Error: " + error.message;
+            } finally {
+                protectBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
