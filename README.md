@@ -1,6 +1,6 @@
 # NeuroShield 🛡️
-
-**NeuroShield** (formerly PhotoGuard/Replication) is a tool to immunize images against unauthorized AI manipulation using adversarial perturbations.
+** Live at : https://fuego-alpha.vercel.app/
+**NeuroShield**  is a tool to immunize images against unauthorized AI manipulation using adversarial perturbations.
 
 This project cross-platform supported (Local & Google Colab).
 
