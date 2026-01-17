@@ -3,13 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How it Works | Neuro Shield</title>
+    <title>How it Works </title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
     <div class="container">
         <header>
+            <nav class="cyber-nav">
+                <a href="./index.html" class="nav-item active>
+                    <i class="ph ph-shield-check"></i> Neuro Shield
+                </a>
+                <div class="nav-links">
+                    <a href="./index.html" class="nav-item">Terminal</a>
+                    <a href="./docs.html" class="nav-item highlight active">Docs</a>
+                    <a href="./contact.html" class="nav-item">Contact</a>
+                </div>
+            </nav>
             <h1>
                 <a href="./index.html" class="logo-link">Neuro Shield</a>
             </h1>
@@ -19,7 +29,7 @@
         <div class="info-section">
             <h2><i class="ph ph-code"></i> Technical Overview</h2>
             
-            <div class="step">
+            <div class="doc-section">
                 <h3>1. The Adversarial Perturbation</h3>
                 <p>
                     AI models "see" images as mathematical tensors (grids of numbers). 
@@ -29,11 +39,11 @@
                 </p>
             </div>
 
-            <div class="step">
+            <div class="doc-section">
                 <h3>2. Shield Capability Matrix</h3>
                 <div class="comparison-table">
                     <div class="comp-col">
-                        <strong>🛡️ Simple Shield (Free)</strong>
+                        <strong><div class="shield-icon"><i class="ph ph-lock-key"></i> Simple Shield (Free)</strong></div>
                         <p style="margin-bottom: 10px;">Uses Fast Gradient Sign Method (FGSM) on VAE Latent Space.</p>
                         <ul style="padding-left: 20px; margin: 0; color: #a3a3a3;">
                             <li>Effective against: <strong>Stable Diffusion 1.4 / 1.5</strong></li>
@@ -41,8 +51,9 @@
                             <li>Effective against: <strong>Basic Web Scrapers</strong></li>
                         </ul>
                     </div>
+                    <br>
                     <div class="comp-col pro">
-                        <strong>⚔️ Extreme Shield (Pro)</strong>
+                        <strong><div class="shield-icon"><i class="ph ph-shield-star"></i>Extreme Shield (Pro)</strong></div>
                         <p style="margin-bottom: 10px;">
                             Uses deep iterative PGD attacks targeting the exact CLIP/UNet visual encoding layers.
                         </p>
@@ -55,7 +66,7 @@
                 </div>
             </div>
 
-            <div class="step">
+            <div class="doc-section">
                 <h3>3. Privacy Protocol</h3>
                 <p>Processing occurs entirely in Volatile Memory (RAM). No data is written to disk. The session destroys all tensors immediately after the result is returned.</p>
             </div>

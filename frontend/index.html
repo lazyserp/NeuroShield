@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Immunizer | Privacy Shield</title>
+    <title>Neuro Shield</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -52,16 +52,27 @@
 <body>
     <div class="container">
         <header>
+            <nav class="cyber-nav">
+                <a href="./index.html" class="nav-item active>
+                    <i class="ph ph-shield-check"></i> Neuro Shield
+                </a>
+                <div class="nav-links">
+                    <a href="./index.html" class="nav-item highlight">Terminal</a>
+                    <a href="./docs.html" class="nav-item">Docs</a>
+                    <a href="./contact.html" class="nav-item ">Contact</a>
+                </div>
+            </nav>
             <h1>
                 <a href="./index.html" class="logo-link">Neuro Shield</a>
             </h1>
             <p class="subtitle">Secure your digital identity against AI training.</p>
+            
         </header>
 
         <div class="judge-banner">
             <i class="ph ph-warning-circle" style="font-size: 1.2rem;"></i>
             <div>
-                <strong>Judge's Notice:</strong> High-Performance Cloud GPUs are expensive. The server is not running 24/7. 
+                <strong>Judge's Notice:</strong> High-Performance Cloud GPUs are expensive. The server is not running 24/7. It is done to minimise costs. 
                 <br>
                 To test live, please ping me at: <span style="color: #fb64b6;"><a href="https://x.com/hazybishop" target="_blank"> Aman's X ( formerly Twitter)</a></span>
             </div>
@@ -69,7 +80,7 @@
 
         <div class="settings-box">
             <i class="ph ph-plug"></i>
-            <input type="text" id="apiUrl" placeholder="Paste Server URL..." value="">
+            <input type="text" id="apiUrl" placeholder="Kindly ping me for server URL and paste it here." value="">
             <span class="status-dot" id="connectionStatus" title="Disconnected"></span>
         </div>
 
@@ -86,7 +97,7 @@
 
             <div class="shield-selector">
                 <div class="shield-option selected" onclick="selectShield('simple')" id="btnSimple">
-                    <div class="shield-icon">🛡️</div>
+                    <div class="shield-icon"><i class="ph ph-lock-key"></i></div>
                     <div class="shield-info">
                         <strong>Simple Shield</strong>
                         <span>Standard Protection</span>
@@ -94,7 +105,7 @@
                 </div>
                 
                 <div class="shield-option locked" onclick="showLockMessage()" id="btnExtreme">
-                    <div class="shield-icon"><i class="ph ph-lock-key"></i></div>
+                    <div class="shield-icon"><i class="ph ph-shield-star"></i></div>
                     <div class="shield-info">
                         <strong>Extreme Shield</strong>
                         <span>Pro • GPU Heavy</span>
@@ -187,7 +198,7 @@
         }
 
         function showLockMessage() {
-            alert("🔒 PRO FEATURE LOCKED\n\nTo keep Neuro Shield free, we use lightweight servers. 'Extreme Shield' requires massive H100 GPU clusters to run complex iterative attacks against advanced models like Grok or ChatGPT.\n\nThis feature is currently disabled to save costs. Please support the project to unlock full server capacity!");
+            alert("🔒 PRO FEATURE LOCKED\n\nTo keep Neuro Shield free, we use lightweight servers. 'Extreme Shield' requires massive NVIDIA H200 NVL GPU clusters to run complex iterative attacks against advanced models like Grok or ChatGPT.\n\nThis feature is currently disabled to save costs. Please support the project to unlock full server capacity!");
         }
 
         dropZone.addEventListener('click', () => fileInput.click());
