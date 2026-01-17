@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How it Works | Image Immunizer</title>
+    <title>How it Works | Neuro Shield</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -11,51 +11,49 @@
     <div class="container">
         <header>
             <h1>
-                <a href="./index.html" class="logo-link">Image Immunizer 🛡️</a>
+                <a href="./index.html" class="logo-link">Neuro Shield</a>
             </h1>
-            <p class="subtitle">Protect your personal photos from AI training and manipulation.</p>
+            <p class="subtitle">Documentation & Mechanics</p>
         </header>
 
         <div class="info-section">
-            <h2><i class="ph ph-question"></i> How This Works</h2>
+            <h2><i class="ph ph-code"></i> Technical Overview</h2>
             
             <div class="step">
-                <h3>1. The Invisible Layer</h3>
+                <h3>1. The Adversarial Perturbation</h3>
                 <p>
-                    Computers don't "see" images like humans do. They see a grid of numbers. 
-                    We take your image (the superficial layer) and add a specifically calculated "digital mist." 
-                    To your eyes, the photo looks exactly the same. To an AI, the numbers are now scrambled, 
-                    making it impossible to interpret the image content.
+                    AI models "see" images as mathematical tensors (grids of numbers). 
+                    We inject a calculated "digital mist" (Gaussian noise optimized via gradient descent) 
+                    that aligns specifically with the features neural networks look for.
+                    To a human, the image is unchanged. To an AI, the feature vectors are scrambled.
                 </p>
             </div>
 
             <div class="step">
-                <h3>2. Simple vs. Extreme Shield</h3>
+                <h3>2. Shield Architecture</h3>
                 <div class="comparison-table">
                     <div class="comp-col">
                         <strong>🛡️ Simple Shield (Free)</strong>
-                        <p>Apply a lightweight noise pattern. It's fast and runs on basic servers. Good for casual social media privacy.</p>
+                        <p>Uses a fast "Fast Gradient Sign Method" (FGSM) approach on the VAE Latent Space. Low compute cost.</p>
                     </div>
                     <div class="comp-col pro">
                         <strong>⚔️ Extreme Shield (Pro)</strong>
                         <p>
-                            Uses massive GPU power (Graphics Processing Units). We simulate an enemy AI trying to attack your photo, 
-                            calculate exactly where it is weak, and reinforce those pixels. 
-                            <br><br>
-                            <em>Why is it Pro?</em> This requires loading 4GB+ of AI models into memory and running complex calculus 
-                            that costs significant electricity and server rental fees.
+                            Uses "Projected Gradient Descent" (PGD) directly against the Stable Diffusion UNet. 
+                            We calculate the gradients required to shift the image into the "void" of the model's understanding.
+                            Requires ~4GB VRAM per image.
                         </p>
                     </div>
                 </div>
             </div>
 
             <div class="step">
-                <h3>3. Privacy First</h3>
-                <p>We process your image in RAM (Temporary Memory). Once the "shield" is applied and sent back to you, the original is instantly deleted. We never use your photos to train AI.</p>
+                <h3>3. Privacy Protocol</h3>
+                <p>Processing occurs entirely in Volatile Memory (RAM). No data is written to disk. The session destroys all tensors immediately after the result is returned.</p>
             </div>
             
             <a href="./index.html" class="btn-secondary" style="margin-top: 20px;">
-                <i class="ph ph-arrow-left"></i> Back to Immunizer
+                <i class="ph ph-arrow-left"></i> Return to Terminal
             </a>
         </div>
     </div>

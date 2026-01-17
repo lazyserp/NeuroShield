@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Immunizer | Anti-AI Privacy</title>
+    <title>Image Immunizer | Privacy Shield</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -17,11 +17,11 @@
         }
         .comp-box {
             flex: 1;
-            background: #0f172a;
+            background: #0a0a0a;
             border-radius: 8px;
             padding: 10px;
             text-align: center;
-            border: 1px solid #334155;
+            border: 1px solid #333;
             display: flex;
             flex-direction: column;
         }
@@ -29,20 +29,22 @@
             width: 100%;
             height: auto;
             border-radius: 4px;
-            object-fit: cover; /* Ensures images align nicely */
+            object-fit: cover; 
             flex-grow: 1;
+            border: 1px solid #262626;
         }
         .comp-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
             font-weight: bold;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
-        .label-shield { color: #38bdf8; }
-        .label-attack { color: #ef4444; }
+        /* Updated Colors for New Theme */
+        .label-shield { color: #fb64b6; text-shadow: 0 0 10px rgba(251, 100, 182, 0.4); }
+        .label-attack { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
         
-        /* Mobile responsive */
         @media (max-width: 500px) {
             .comparison-container { flex-direction: column; }
         }
@@ -54,18 +56,18 @@
             <h1>
                 <a href="./index.html" class="logo-link">Neuro Shield</a>
             </h1>
-            <p class="subtitle">Protect your personal photos from AI training and manipulation.</p>
+            <p class="subtitle">Secure your digital identity against AI training.</p>
         </header>
 
         <div class="settings-box">
             <i class="ph ph-plug"></i>
-            <input type="text" id="apiUrl" placeholder="Paste Server URL" value="">
+            <input type="text" id="apiUrl" placeholder="Paste Server URL..." value="">
             <span class="status-dot" id="connectionStatus" title="Disconnected"></span>
         </div>
 
         <div class="main-card">
             <div class="upload-area" id="dropZone">
-                <i class="ph ph-upload-simple" style="font-size: 3rem; color: #64748b;"></i>
+                <i class="ph ph-upload-simple" style="font-size: 3rem;"></i>
                 <p>Click to upload or drag & drop</p>
                 <input type="file" id="fileInput" accept="image/*" hidden>
             </div>
@@ -99,12 +101,12 @@
 
         <div id="status" class="hidden">
             <div class="loader"></div>
-            <p id="statusText">Calculating Adversarial Noise...</p>
+            <p id="statusText" style="text-align: center; color: #fb64b6; font-family: 'JetBrains Mono'; font-size: 0.8rem;">Calculating Adversarial Noise...</p>
         </div>
 
         <div class="result-section hidden" id="resultSection">
-            <div class="success-banner">
-                <i class="ph ph-check-circle"></i> Immunization Complete
+            <div class="success-banner" style="color: #fb64b6; margin-bottom: 15px; font-weight: bold;">
+                <i class="ph ph-check-circle"></i> IMMUNIZATION COMPLETE
             </div>
             <div class="image-box">
                 <img id="protectedPreview" src="" alt="Protected">
@@ -114,22 +116,22 @@
             </div>
         </div>
 
-        <div class="main-card hidden" id="verifySection" style="border-top: 4px solid #ef4444;">
+        <div class="main-card hidden" id="verifySection" style="border-top: 1px solid #ef4444; margin-top: 20px;">
             <div class="verify-header">
-                <h3><i class="ph ph-robot"></i> Test Your Shield</h3>
-                <p>Challenge a real AI (Stable Diffusion) to manipulate this image.</p>
+                <h3><i class="ph ph-robot"></i> Verify Robustness</h3>
+                <p>Challenge a real AI to manipulate this image.</p>
             </div>
             
             <div class="input-group">
-                <input type="text" id="verifyPrompt" placeholder="E.g., Make this person look like a cyborg..." value="Make this person look like a cyborg">
+                <input type="text" id="verifyPrompt" placeholder="Prompt..." value="Make this person look like a cyborg">
                 <button onclick="runVerification()" id="verifyBtn" class="btn-danger">
-                    Run Attack
+                    ATTACK
                 </button>
             </div>
 
-            <div id="verifyStatus" class="hidden" style="margin-top: 15px;">
+            <div id="verifyStatus" class="hidden" style="margin-top: 15px; text-align: center;">
                 <div class="loader" style="width: 15px; height: 15px; border-top-color: #ef4444;"></div>
-                <p style="font-size: 0.8rem; color: #94a3b8;">AI is attempting to edit image...</p>
+                <p style="font-size: 0.8rem; color: #ef4444; font-family: 'JetBrains Mono';">Attacking Image...</p>
             </div>
 
             <div class="verify-result hidden" id="verifyResult">
@@ -145,20 +147,21 @@
                     </div>
                 </div>
                 <p class="verify-caption" style="margin-top:10px;">
-                    The shield worked if the right image looks awfully fake, distorted, gray, or ignores the prompt.
+                    Success: The AI failed to interpret the image content.
                 </p>
             </div>
         </div>
 
         <div class="info-section">
-            <h2><i class="ph ph-question"></i> Need Help?</h2>
+            <h2><i class="ph ph-terminal-window"></i> System Info</h2>
             <a href="./Work.html" class="btn-secondary">
-                See How This Works
+                View Documentation
             </a>
         </div>
     </div>
 
     <script>
+        // ... (The Javascript logic remains exactly the same as before)
         let currentMode = 'simple';
         let protectedBlob = null; 
 
@@ -184,11 +187,11 @@
 
         dropZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#38bdf8'; });
-        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = '#475569'; });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#fb64b6'; });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = '#404040'; });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.style.borderColor = '#475569';
+            dropZone.style.borderColor = '#404040';
             if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
         });
 
@@ -207,10 +210,12 @@
                 const res = await fetch(`${url}/`);
                 if(res.ok) {
                     document.getElementById('connectionStatus').style.backgroundColor = "#4ade80";
+                    document.getElementById('connectionStatus').style.boxShadow = "0 0 10px #4ade80";
                     document.getElementById('connectionStatus').title = "Online";
                 }
             } catch(e) {
                 document.getElementById('connectionStatus').style.backgroundColor = "#ef4444";
+                document.getElementById('connectionStatus').style.boxShadow = "0 0 10px #ef4444";
             }
         });
 
@@ -225,8 +230,8 @@
             document.getElementById('verifySection').classList.add('hidden');
             
             statusText.innerText = currentMode === 'extreme' 
-                ? "Running Deep Diffusion Gradient Attack (This takes longer)..." 
-                : "Applying  Adversarial Noise...";
+                ? "Running Diffusion Gradient Attack..." 
+                : "Calculating Adversarial Noise...";
 
             const formData = new FormData();
             formData.append("file", file);
@@ -243,7 +248,7 @@
                 const url = URL.createObjectURL(protectedBlob);
                 
                 document.getElementById('protectedPreview').src = url;
-                document.getElementById('verifyInputImg').src = url; // Pre-load into comparison
+                document.getElementById('verifyInputImg').src = url; 
                 document.getElementById('downloadLink').href = url;
                 
                 document.getElementById('status').classList.add('hidden');
