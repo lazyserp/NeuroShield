@@ -22,7 +22,7 @@ body {
 a { text-decoration: none; color: inherit; transition: 0.2s; }
 
 /* Fonts */
-h1, h2, h3, .shield-info strong {
+h1, h2, h3, .shield-info strong, .judge-banner strong {
     font-family: 'JetBrains Mono', monospace; 
 }
 
@@ -49,7 +49,26 @@ h1 { text-align: center; margin-bottom: 0; }
 }
 
 /* =========================================
-   2. COMPONENTS 
+   2. JUDGE NOTICE (NEW)
+   ========================================= */
+.judge-banner {
+    background: #1a1a0a; /* Very dark yellow/brown hint */
+    border: 1px solid #fbbf24;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: #d4d4d8;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+}
+.judge-banner i { color: #fbbf24; margin-top: 2px; }
+
+/* =========================================
+   3. COMPONENTS 
    ========================================= */
 
 /* Settings Bar */
@@ -107,12 +126,24 @@ h1 { text-align: center; margin-bottom: 0; }
     box-shadow: 0 0 15px rgba(251, 100, 182, 0.1);
 }
 
+/* LOCKED State (NEW) */
+.shield-option.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: #333;
+    position: relative;
+}
+.shield-option.locked:hover {
+    border-color: #fbbf24;
+    opacity: 0.7;
+}
+
 .shield-icon { font-size: 1.5rem; }
 .shield-info strong { display: block; color: #fff; font-size: 0.85rem; letter-spacing: -0.5px; }
 .shield-info span { font-size: 0.75rem; color: #737373; font-family: 'Inter', sans-serif; }
 
 /* =========================================
-   3. BUTTONS (FIXED PRO COLORING)
+   4. BUTTONS
    ========================================= */
 button, .btn-secondary, .btn-download, .btn-danger {
     display: block; width: 100%; text-align: center;
@@ -135,15 +166,11 @@ button:hover {
 }
 button:disabled { background-color: #404040; color: #737373; cursor: not-allowed; box-shadow: none; }
 
-/* PRO Button (FIXED: Now Cyber-Gold instead of weird Purple) */
+/* PRO Button */
 .btn-pro { 
-    background: linear-gradient(135deg, #fbbf24, #d97706); /* Gold Gradient */
+    background: linear-gradient(135deg, #fbbf24, #d97706); 
     color: black; 
     border: 1px solid #fbbf24;
-}
-.btn-pro:hover { 
-    background: linear-gradient(135deg, #fcd34d, #b45309);
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); /* Gold Glow */
 }
 
 /* Secondary Buttons */
@@ -169,7 +196,7 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 .btn-danger:disabled { background: #451a1a; color: #7f1d1d; box-shadow: none; }
 
 /* =========================================
-   4. INFO & RESULTS
+   5. INFO & RESULTS
    ========================================= */
 .result-section { text-align: center; background: #111111; padding: 20px; border-radius: 12px; border: 1px solid #262626; }
 .image-box img { max-width: 100%; border-radius: 8px; border: 1px solid #404040; }
@@ -184,18 +211,12 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 .step h3 { color: #fb64b6; font-size: 0.95rem; margin-bottom: 5px; }
 .step p { color: #a3a3a3; font-size: 0.9rem; line-height: 1.6; }
 
-/* Comparison Table (Fixed Pro Column) */
 .comparison-table { display: flex; gap: 10px; margin-top: 10px; }
 .comp-col { flex: 1; background: #0a0a0a; padding: 15px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #262626; }
-
-/* FIXED: Pro Column now matches the Gold button */
-.comp-col.pro { 
-    border: 1px solid #d97706; 
-    box-shadow: 0 0 10px rgba(217, 119, 6, 0.1); 
-}
+.comp-col.pro { border: 1px solid #d97706; box-shadow: 0 0 10px rgba(217, 119, 6, 0.1); }
 
 /* =========================================
-   5. VERIFICATION SECTION
+   6. VERIFICATION SECTION
    ========================================= */
 .verify-header h3 { color: #ef4444; margin: 0; display: flex; align-items: center; gap: 10px; }
 .verify-header p { color: #737373; font-size: 0.85rem; margin-top: 5px; }
@@ -216,16 +237,10 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 .verify-label { color: #737373; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin: 0; }
 .verify-caption { color: #ef4444; font-size: 0.8rem; margin: 0; }
 
-/* =========================================
-   6. UTILITIES
-   ========================================= */
 .hidden { display: none !important; }
-
 .loader { 
-    border: 3px solid #262626; 
-    border-top: 3px solid #fb64b6; 
+    border: 3px solid #262626; border-top: 3px solid #fb64b6; 
     border-radius: 50%; width: 20px; height: 20px; 
     animation: spin 1s linear infinite; margin: 0 auto 10px auto; 
 }
-
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }

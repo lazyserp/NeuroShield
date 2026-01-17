@@ -4,8 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Immunizer | Privacy Shield</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* INLINE STYLES FOR COMPARISON SLIDER */
+        .comparison-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            align-items: stretch;
+        }
+        .comp-box {
+            flex: 1;
+            background: #0a0a0a;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        .comp-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            object-fit: cover; 
+            flex-grow: 1;
+            border: 1px solid #262626;
+        }
+        .comp-label {
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .label-shield { color: #fb64b6; text-shadow: 0 0 10px rgba(251, 100, 182, 0.4); }
+        .label-attack { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+        
+        @media (max-width: 500px) {
+            .comparison-container { flex-direction: column; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -15,6 +57,15 @@
             </h1>
             <p class="subtitle">Secure your digital identity against AI training.</p>
         </header>
+
+        <div class="judge-banner">
+            <i class="ph ph-warning-circle" style="font-size: 1.2rem;"></i>
+            <div>
+                <strong>Judge's Notice:</strong> High-Performance GPUs are expensive. The server is not running 24/7. 
+                <br>
+                To test live, please ping me at: <span style="color: #fb64b6;">[YOUR_USERNAME]</span>
+            </div>
+        </div>
 
         <div class="settings-box">
             <i class="ph ph-plug"></i>
@@ -42,8 +93,8 @@
                     </div>
                 </div>
                 
-                <div class="shield-option" onclick="selectShield('extreme')" id="btnExtreme">
-                    <div class="shield-icon">⚔️</div>
+                <div class="shield-option locked" onclick="showLockMessage()" id="btnExtreme">
+                    <div class="shield-icon"><i class="ph ph-lock-key"></i></div>
                     <div class="shield-info">
                         <strong>Extreme Shield</strong>
                         <span>Pro • GPU Heavy</span>
@@ -117,7 +168,137 @@
         </div>
     </div>
 
-    <!-- Main Logic -->
-    <script src="js/app.js"></script>
+    <script>
+        let currentMode = 'simple';
+        let protectedBlob = null; 
+
+        const fileInput = document.getElementById('fileInput');
+        const apiUrlInput = document.getElementById('apiUrl');
+        const immunizeBtn = document.getElementById('immunizeBtn');
+        const statusText = document.getElementById('statusText');
+        const dropZone = document.getElementById('dropZone');
+
+        function selectShield(mode) {
+            currentMode = mode;
+            // Only simple mode logic here since Extreme is locked
+            document.getElementById('btnSimple').classList.add('selected');
+            immunizeBtn.innerText = "Initialize Protection (Free)";
+            immunizeBtn.classList.remove('btn-pro');
+        }
+
+        function showLockMessage() {
+            alert("🔒 PRO FEATURE LOCKED\n\nTo keep Neuro Shield free, we use lightweight servers. 'Extreme Shield' requires massive H100 GPU clusters to run complex iterative attacks against advanced models like Grok or ChatGPT.\n\nThis feature is currently disabled to save costs. Please support the project to unlock full server capacity!");
+        }
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#fb64b6'; });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = '#404040'; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#404040';
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (file) {
+                document.getElementById('originalPreview').src = URL.createObjectURL(file);
+                document.getElementById('previewContainer').classList.remove('hidden');
+                dropZone.style.display = 'none';
+                immunizeBtn.disabled = false;
+            }
+        }
+
+        apiUrlInput.addEventListener('input', async () => {
+            const url = apiUrlInput.value.replace(/\/$/, "");
+            try {
+                const res = await fetch(`${url}/`);
+                if(res.ok) {
+                    document.getElementById('connectionStatus').style.backgroundColor = "#4ade80";
+                    document.getElementById('connectionStatus').style.boxShadow = "0 0 10px #4ade80";
+                    document.getElementById('connectionStatus').title = "Online";
+                }
+            } catch(e) {
+                document.getElementById('connectionStatus').style.backgroundColor = "#ef4444";
+                document.getElementById('connectionStatus').style.boxShadow = "0 0 10px #ef4444";
+            }
+        });
+
+        async function processImage() {
+            const file = fileInput.files[0];
+            let baseUrl = apiUrlInput.value.replace(/\/$/, "");
+            if (!baseUrl || !file) return alert("Check Server URL and File.");
+
+            immunizeBtn.disabled = true;
+            document.getElementById('status').classList.remove('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('verifySection').classList.add('hidden');
+            
+            statusText.innerText = "Calculating Adversarial Noise...";
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("mode", "simple"); // Force Simple mode since pro is locked
+
+            try {
+                const response = await fetch(`${baseUrl}/immunize`, {
+                    method: "POST",
+                    body: formData
+                });
+                if (!response.ok) throw new Error("Processing Failed");
+
+                protectedBlob = await response.blob();
+                const url = URL.createObjectURL(protectedBlob);
+                
+                document.getElementById('protectedPreview').src = url;
+                document.getElementById('verifyInputImg').src = url; 
+                document.getElementById('downloadLink').href = url;
+                
+                document.getElementById('status').classList.add('hidden');
+                document.getElementById('resultSection').classList.remove('hidden');
+                document.getElementById('verifySection').classList.remove('hidden'); 
+                immunizeBtn.disabled = false;
+                
+            } catch (error) {
+                alert("Error: " + error.message);
+                document.getElementById('status').classList.add('hidden');
+                immunizeBtn.disabled = false;
+            }
+        }
+
+        async function runVerification() {
+            if (!protectedBlob) return alert("No protected image found!");
+            let baseUrl = apiUrlInput.value.replace(/\/$/, "");
+            const prompt = document.getElementById('verifyPrompt').value;
+
+            document.getElementById('verifyBtn').disabled = true;
+            document.getElementById('verifyStatus').classList.remove('hidden');
+            document.getElementById('verifyResult').classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append("file", protectedBlob, "protected.png");
+            formData.append("prompt", prompt);
+
+            try {
+                const response = await fetch(`${baseUrl}/verify`, {
+                    method: "POST",
+                    body: formData
+                });
+                if (!response.ok) throw new Error("Verification Failed");
+
+                const blob = await response.blob();
+                document.getElementById('verifyOutputImg').src = URL.createObjectURL(blob);
+                
+                document.getElementById('verifyStatus').classList.add('hidden');
+                document.getElementById('verifyResult').classList.remove('hidden');
+                document.getElementById('verifyBtn').disabled = false;
+
+            } catch (error) {
+                alert("Verification Error: " + error.message);
+                document.getElementById('verifyStatus').classList.add('hidden');
+                document.getElementById('verifyBtn').disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>
