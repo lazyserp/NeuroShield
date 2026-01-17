@@ -2,7 +2,7 @@
 
 **NeuroShield** (formerly PhotoGuard/Replication) is a tool to immunize images against unauthorized AI manipulation using adversarial perturbations.
 
-This project has been refactored into a modular structure for better maintainability and cross-platform support (Local & Google Colab).
+This project cross-platform supported (Local & Google Colab).
 
 ## Project Structure
 
@@ -24,7 +24,7 @@ Since this project requires a GPU for the diffusion models, Google Colab is the 
 
 1.  **Clone the Repository** in a Colab cell:
     ```python
-    !git clone https://github.com/YOUR_USERNAME/NeuroShield.git
+    !git clone https://github.com/lazyserp/NeuroShield.git
     %cd NeuroShield
     ```
 
