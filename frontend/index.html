@@ -18,7 +18,7 @@
 
         <div class="settings-box">
             <i class="ph ph-plug"></i>
-            <input type="text" id="apiUrl" placeholder="Paste Server URL here (e.g., https://...ngrok-free.app)" value="">
+            <input type="text" id="apiUrl" placeholder="Paste Server URL (e.g., https://...ngrok-free.app)" value="">
             <span class="status-dot" id="connectionStatus" title="Disconnected"></span>
         </div>
 
@@ -73,6 +73,31 @@
             </div>
         </div>
 
+        <div class="main-card hidden" id="verifySection" style="border-top: 4px solid #ef4444;">
+            <div class="verify-header">
+                <h3><i class="ph ph-robot"></i> Test Your Shield</h3>
+                <p>Challenge a real AI (Stable Diffusion) to manipulate this image. If the shield works, the result will look broken or chaotic.</p>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="verifyPrompt" placeholder="E.g., Make this person look like a cyborg..." value="Make this person look like a cyborg">
+                <button onclick="runVerification()" id="verifyBtn" class="btn-danger">
+                    Run AI Attack Simulation
+                </button>
+            </div>
+
+            <div id="verifyStatus" class="hidden" style="margin-top: 15px;">
+                <div class="loader" style="width: 15px; height: 15px; border-top-color: #ef4444;"></div>
+                <p style="font-size: 0.8rem; color: #94a3b8;">AI is attempting to edit image...</p>
+            </div>
+
+            <div class="verify-result hidden" id="verifyResult">
+                <p class="verify-label">AI Output (The Attempt):</p>
+                <img id="verifyImg" src="" alt="AI Failed Attempt">
+                <p class="verify-caption">If this looks like garbage or static, <strong>the shield is working.</strong></p>
+            </div>
+        </div>
+
         <div class="info-section">
             <h2><i class="ph ph-question"></i> Need Help?</h2>
             <a href="./Work.html" class="btn-secondary">
@@ -83,17 +108,17 @@
 
     <script>
         let currentMode = 'simple';
+        let protectedBlob = null; // Store result for verification
+
         const fileInput = document.getElementById('fileInput');
         const apiUrlInput = document.getElementById('apiUrl');
         const immunizeBtn = document.getElementById('immunizeBtn');
         const statusText = document.getElementById('statusText');
         const dropZone = document.getElementById('dropZone');
 
-        // Toggle Logic
         function selectShield(mode) {
             currentMode = mode;
             document.querySelectorAll('.shield-option').forEach(el => el.classList.remove('selected'));
-            
             if(mode === 'simple') {
                 document.getElementById('btnSimple').classList.add('selected');
                 immunizeBtn.innerText = "Initialize Protection (Free)";
@@ -105,11 +130,8 @@
             }
         }
 
-        // Upload Handlers
         dropZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-        
-        // Drag and Drop Support
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#38bdf8'; });
         dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = '#475569'; });
         dropZone.addEventListener('drop', (e) => {
@@ -127,7 +149,6 @@
             }
         }
 
-        // Connection Check
         apiUrlInput.addEventListener('input', async () => {
             const url = apiUrlInput.value.replace(/\/$/, "");
             try {
@@ -141,18 +162,15 @@
             }
         });
 
-        // Main Process
         async function processImage() {
             const file = fileInput.files[0];
             let baseUrl = apiUrlInput.value.replace(/\/$/, "");
-            
-            if (!baseUrl) return alert("Please enter the Server URL first.");
-            if (!file) return alert("Please upload an image first.");
+            if (!baseUrl || !file) return alert("Check Server URL and File.");
 
-            // UI Updates
             immunizeBtn.disabled = true;
             document.getElementById('status').classList.remove('hidden');
             document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('verifySection').classList.add('hidden');
             
             statusText.innerText = currentMode === 'extreme' 
                 ? "Running Deep Diffusion Gradient Attack (This takes ~20s)..." 
@@ -160,30 +178,64 @@
 
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("mode", currentMode); 
+            formData.append("mode", currentMode);
 
             try {
                 const response = await fetch(`${baseUrl}/immunize`, {
                     method: "POST",
                     body: formData
                 });
+                if (!response.ok) throw new Error("Processing Failed");
 
-                if (!response.ok) throw new Error("Server Processing Failed");
-
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
+                protectedBlob = await response.blob();
+                const url = URL.createObjectURL(protectedBlob);
                 
                 document.getElementById('protectedPreview').src = url;
                 document.getElementById('downloadLink').href = url;
                 
                 document.getElementById('status').classList.add('hidden');
                 document.getElementById('resultSection').classList.remove('hidden');
+                document.getElementById('verifySection').classList.remove('hidden'); // Show Verify Section
                 immunizeBtn.disabled = false;
                 
             } catch (error) {
                 alert("Error: " + error.message);
                 document.getElementById('status').classList.add('hidden');
                 immunizeBtn.disabled = false;
+            }
+        }
+
+        async function runVerification() {
+            if (!protectedBlob) return alert("No protected image found!");
+            let baseUrl = apiUrlInput.value.replace(/\/$/, "");
+            const prompt = document.getElementById('verifyPrompt').value;
+
+            document.getElementById('verifyBtn').disabled = true;
+            document.getElementById('verifyStatus').classList.remove('hidden');
+            document.getElementById('verifyResult').classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append("file", protectedBlob, "protected.png");
+            formData.append("prompt", prompt);
+
+            try {
+                const response = await fetch(`${baseUrl}/verify`, {
+                    method: "POST",
+                    body: formData
+                });
+                if (!response.ok) throw new Error("Verification Failed");
+
+                const blob = await response.blob();
+                document.getElementById('verifyImg').src = URL.createObjectURL(blob);
+                
+                document.getElementById('verifyStatus').classList.add('hidden');
+                document.getElementById('verifyResult').classList.remove('hidden');
+                document.getElementById('verifyBtn').disabled = false;
+
+            } catch (error) {
+                alert("Verification Error: " + error.message);
+                document.getElementById('verifyStatus').classList.add('hidden');
+                document.getElementById('verifyBtn').disabled = false;
             }
         }
     </script>

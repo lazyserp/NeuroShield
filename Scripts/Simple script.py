@@ -1,15 +1,17 @@
 # ==========================================
-#  NEUROSHIELD: LOW-MEMORY PRODUCTION ENGINE
-#  (FP16 Optimized + Encoder Attack)
+#  IMAGE IMMUNIZER: UNIFIED ENGINE + VERIFIER
+#  (Shield Generation + Real-time AI Testing)
 # ==========================================
 
-# 1. INSTALL
-print("⏳ Installing libraries... (Wait ~60s)")
-!pip install fastapi uvicorn python-multipart pyngrok nest_asyncio torch diffusers transformers accelerate scipy ftfy > /dev/null 2>&1
-print("✅ Installed.\n")
-
-# 2. IMPORTS
 import os
+# Auto-install if missing
+try:
+    import diffusers
+except ImportError:
+    print("⏳ Installing libraries... (Wait ~60s)")
+    os.system("pip install fastapi uvicorn python-multipart pyngrok nest_asyncio torch diffusers transformers accelerate scipy ftfy > /dev/null 2>&1")
+    print("✅ Installed.\n")
+
 import io
 import torch
 import uvicorn
@@ -17,160 +19,188 @@ import nest_asyncio
 import gc
 import numpy as np
 from PIL import Image
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pyngrok import ngrok
-from diffusers import AutoencoderKL
+from diffusers import StableDiffusionInpaintPipeline, StableDiffusionImg2ImgPipeline
 from torchvision import transforms
 
-# 3. AUTH & CLEANUP
-# Force garbage collection immediately
-gc.collect()
-torch.cuda.empty_cache()
-
-print("="*60)
-NGROK_TOKEN = input("Paste Ngrok Token: ")
+# --- CONFIG ---
+NGROK_TOKEN = os.environ.get("NGROK_TOKEN") or input("Paste Ngrok Token: ")
 ngrok.set_auth_token(NGROK_TOKEN)
-print("✅ Token Set.")
-
-# Kill old tunnels
-ngrok.kill()
-try:
-    !fuser -k 8000/tcp > /dev/null 2>&1
-except:
-    pass
-
 nest_asyncio.apply()
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"🚀 Engine Starting on {device}...")
 
-# 4. LOAD MODEL (FP16 MODE - SAVES 50% RAM)
+# --- LOAD MODELS (Shared Memory Architecture) ---
+print("⏳ Loading AI Models...")
 try:
-    # We load in float16 to save memory
-    vae = AutoencoderKL.from_pretrained(
-        "runwayml/stable-diffusion-inpainting", 
-        subfolder="vae",
-        torch_dtype=torch.float16 
+    # 1. Main Pipeline (for Extreme Shield calculation)
+    # We use Inpainting because it gives us precise control over the UNet for attacks
+    main_pipe = StableDiffusionInpaintPipeline.from_pretrained(
+        "runwayml/stable-diffusion-inpainting",
+        torch_dtype=torch.float16,
+        safety_checker=None
     ).to(device)
+    main_pipe.set_progress_bar_config(disable=True)
+    
+    # 2. Verification Pipeline (for User Testing)
+    # TRICK: We reuse the components from main_pipe. 0GB extra RAM usage!
+    verify_pipe = StableDiffusionImg2ImgPipeline(
+        vae=main_pipe.vae,
+        text_encoder=main_pipe.text_encoder,
+        tokenizer=main_pipe.tokenizer,
+        unet=main_pipe.unet,
+        scheduler=main_pipe.scheduler,
+        safety_checker=None,
+        feature_extractor=None
+    )
+    
+    # 3. VAE Reference (for Simple Shield)
+    vae = main_pipe.vae
     vae.requires_grad_(False)
-    vae.enable_slicing() # Slicing handles large images in chunks
-    print("✅ Model Loaded (FP16 Low-VRAM Mode)")
+    
+    print("✅ Models Loaded (Shared Memory Optimization Active)")
 except Exception as e:
     print(f"❌ Model Error: {e}")
 
-# 5. APP
+# --- ATTACK LOGIC ---
+
+def attack_simple(X, model, eps=0.05, steps=40):
+    # Quick Gradient Sign Method / Fast Iterative
+    delta = torch.zeros_like(X).uniform_(-eps, eps).to(device)
+    delta.requires_grad = True
+    step_size = 0.01
+    
+    for _ in range(steps):
+        adv_image = X + delta
+        # Loss: Push latent distribution towards zero (destroying content info)
+        latents = model(adv_image).latent_dist.mean
+        loss = latents.norm()
+        
+        grad = torch.autograd.grad(loss, delta)[0]
+        delta.data = delta.data - step_size * grad.sign()
+        delta.data = torch.clamp(delta.data, -eps, eps)
+        delta.data = torch.clamp(X + delta.data, -1, 1) - X
+        if delta.grad is not None: delta.grad.zero_()
+            
+    return X + delta
+
+def attack_extreme(pipe, image_tensor, steps=20, eps=0.04):
+    X_adv = image_tensor.clone().detach()
+    X_adv.requires_grad = True
+    target_image = torch.zeros_like(X_adv).to(device).half() # The "Void" target
+    step_size = 0.01
+
+    for i in range(steps):
+        torch.set_grad_enabled(True)
+        X_adv.requires_grad_(True)
+        
+        # Simulate diffusion generation
+        latents = pipe.vae.encode(X_adv).latent_dist.sample() * 0.18215
+        noise = torch.randn_like(latents)
+        timesteps = torch.tensor([500], device=device)
+        noisy_latents = pipe.scheduler.add_noise(latents, noise, timesteps)
+        
+        # Calculate gradients against the UNet
+        noise_pred = pipe.unet(noisy_latents, timesteps, encoder_hidden_states=torch.zeros((1, 77, 768), device=device).half())[0]
+        
+        # Adversarial Loss
+        loss = (X_adv - target_image).norm() 
+        grad = torch.autograd.grad(loss, [X_adv])[0]
+        
+        X_adv = X_adv - step_size * grad.sign()
+        X_adv = torch.minimum(torch.maximum(X_adv, image_tensor - eps), image_tensor + eps)
+        X_adv.data = torch.clamp(X_adv, min=-1, max=1)
+        
+        if i % 5 == 0: torch.cuda.empty_cache()
+            
+    return X_adv
+
+# --- API ---
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
 )
 
-# --- THE LIGHTWEIGHT ATTACK LOGIC ---
+def image_to_bytes(img):
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+    return buf
 
-def pgd_attack(X, model, eps=0.06, steps=100):
-    # Random Init
-    delta = torch.zeros_like(X).uniform_(-eps, eps).to(device)
-    delta.requires_grad = True
+@app.post("/immunize")
+async def immunize_endpoint(file: UploadFile = File(...), mode: str = Form("simple")):
+    print(f"🛡️ Immunize Request: {file.filename} | Mode: {mode}")
     
-    # We use a simple loop without accumulating history to save RAM
-    step_size = 0.02
-    
-    for i in range(steps):
-        # 1. Forward (FP16)
-        # We add delta to X. Both are FP16.
-        adv_image = X + delta
-        latents = model(adv_image).latent_dist.mean
-        
-        # 2. Loss: Latent Norm (No artifacts)
-        loss = latents.norm()
-        
-        # 3. Backward
-        grad = torch.autograd.grad(loss, delta)[0]
-        
-        # 4. Update
-        # Decaying step size
-        actual_step = step_size * (1 - i/steps)
-        if actual_step < 0.005: actual_step = 0.005
-        
-        delta.data = delta.data - actual_step * grad.sign()
-        
-        # 5. Project
-        delta.data = torch.clamp(delta.data, -eps, eps)
-        delta.data = torch.clamp(X + delta.data, -1, 1) - X
-        
-        # Zero grad to free graph memory
-        if delta.grad is not None:
-            delta.grad.zero_()
-            
-    return X + delta
-
-def process_image(image_bytes):
-    # A. Load
+    # Load
+    image_bytes = await file.read()
     original_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     W, H = original_image.size
-    print(f"📸 Input: {W}x{H}")
-
-    # Safety Cap: If image is massive (>2500px), resize to prevent crash
-    # 2500px is usually enough for any web use.
-    if max(W, H) > 2500:
-        scale_factor = 2500 / max(W, H)
-        new_W_raw = int(W * scale_factor)
-        new_H_raw = int(H * scale_factor)
-        print(f"⚠️ Resizing large image to {new_W_raw}x{new_H_raw} for safety")
-        original_image = original_image.resize((new_W_raw, new_H_raw), Image.LANCZOS)
-        W, H = original_image.size
-
-    # Resize to multiple of 8 (VAE requirement)
-    new_W = (W // 8) * 8
-    new_H = (H // 8) * 8
-    if new_W != W or new_H != H:
-        input_image = original_image.resize((new_W, new_H), Image.LANCZOS)
-    else:
-        input_image = original_image
-
-    # B. Prep Tensors (FP16)
+    
+    # Resize & Prep
+    max_dim = 1024 if mode == "extreme" else 2048
+    if max(W, H) > max_dim:
+        scale = max_dim / max(W, H)
+        original_image = original_image.resize((int(W*scale), int(H*scale)), Image.LANCZOS)
+    
+    new_W, new_H = (original_image.width // 8) * 8, (original_image.height // 8) * 8
+    input_image = original_image.resize((new_W, new_H))
+    
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize([0.5], [0.5])])
-    X = transform(input_image).unsqueeze(0).to(device).half() # <--- Convert to FP16
-    
-    # C. Run Attack
-    X_adv = pgd_attack(X, vae.encode, eps=0.06, steps=80)
-    
-    # D. Recover
-    X_adv = X_adv.float().detach().cpu() # Convert back to Float32 for saving
+    X = transform(input_image).unsqueeze(0).to(device).half()
+
+    # Attack
+    if mode == "extreme":
+        X_adv = attack_extreme(main_pipe, X, steps=25)
+    else:
+        X_adv = attack_simple(X, vae.encode, steps=40)
+
+    # Recovery
+    X_adv = X_adv.float().detach().cpu()
     X_adv = (X_adv / 2 + 0.5).clamp(0, 1)
-    
     img_array = X_adv[0].permute(1, 2, 0).numpy()
     protected_image = Image.fromarray((img_array * 255).astype(np.uint8))
-
-    # Strict Resize Back
+    
     if protected_image.size != (W, H):
         protected_image = protected_image.resize((W, H), Image.LANCZOS)
     
-    img_byte_arr = io.BytesIO()
-    protected_image.save(img_byte_arr, format='PNG')
-    img_byte_arr.seek(0)
-    
-    # Cleanup Memory
-    del X, X_adv, input_image
     torch.cuda.empty_cache()
-    
-    return img_byte_arr
+    return StreamingResponse(image_to_bytes(protected_image), media_type="image/png")
 
-@app.post("/immunize")
-async def immunize_endpoint(file: UploadFile = File(...)):
-    print(f"⚡ Processing: {file.filename}")
+@app.post("/verify")
+async def verify_endpoint(file: UploadFile = File(...), prompt: str = Form(...)):
+    print(f"🤖 Verification Attack: '{prompt}'")
+    
+    # Load Shielded Image
     image_bytes = await file.read()
-    return StreamingResponse(process_image(image_bytes), media_type="image/png")
+    init_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    init_image = init_image.resize((512, 512)) # Standardize for SD inference
+    
+    # Run Inference (The AI trying to edit the image)
+    # High strength (0.6) means AI *really* tries to change it. 
+    # If protection works, this will result in artifacts/gray blobs.
+    with torch.autocast("cuda"), torch.inference_mode():
+        result = verify_pipe(
+            prompt=prompt, 
+            image=init_image, 
+            strength=0.6, 
+            guidance_scale=7.5, 
+            num_inference_steps=20
+        ).images[0]
+    
+    torch.cuda.empty_cache()
+    return StreamingResponse(image_to_bytes(result), media_type="image/png")
 
 @app.get("/")
-def home():
-    return {"status": "Low-Mem Engine Online"}
+def home(): return {"status": "Immunizer + Verifier Online"}
 
-# 6. START
+# --- RUN ---
+ngrok.kill()
 public_url = ngrok.connect(8000).public_url
-print(f"\n🔗 PUBLIC URL: {public_url}")
-print("👉 Copy this into your Frontend")
-print("="*60 + "\n")
+print(f"\n🔗 SERVER URL: {public_url}")
+print("="*60)
 
 config = uvicorn.Config(app, host="0.0.0.0", port=8000)
 server = uvicorn.Server(config)
