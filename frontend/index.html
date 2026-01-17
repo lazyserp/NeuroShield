@@ -6,6 +6,47 @@
     <title>Image Immunizer | Anti-AI Privacy</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* INLINE STYLES FOR COMPARISON SLIDER */
+        .comparison-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            align-items: stretch;
+        }
+        .comp-box {
+            flex: 1;
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+        }
+        .comp-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            object-fit: cover; /* Ensures images align nicely */
+            flex-grow: 1;
+        }
+        .comp-label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .label-shield { color: #38bdf8; }
+        .label-attack { color: #ef4444; }
+        
+        /* Mobile responsive */
+        @media (max-width: 500px) {
+            .comparison-container { flex-direction: column; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -76,13 +117,13 @@
         <div class="main-card hidden" id="verifySection" style="border-top: 4px solid #ef4444;">
             <div class="verify-header">
                 <h3><i class="ph ph-robot"></i> Test Your Shield</h3>
-                <p>Challenge a real AI (Stable Diffusion) to manipulate this image. If the shield works, the result will look broken or chaotic.</p>
+                <p>Challenge a real AI (Stable Diffusion) to manipulate this image.</p>
             </div>
             
             <div class="input-group">
                 <input type="text" id="verifyPrompt" placeholder="E.g., Make this person look like a cyborg..." value="Make this person look like a cyborg">
                 <button onclick="runVerification()" id="verifyBtn" class="btn-danger">
-                    Run AI Attack Simulation
+                    Run Attack
                 </button>
             </div>
 
@@ -92,9 +133,20 @@
             </div>
 
             <div class="verify-result hidden" id="verifyResult">
-                <p class="verify-label">AI Output (The Attempt):</p>
-                <img id="verifyImg" src="" alt="AI Failed Attempt">
-                <p class="verify-caption">If this looks like garbage or static, <strong>the shield is working.</strong></p>
+                <div class="comparison-container">
+                    <div class="comp-box">
+                        <div class="comp-label label-shield">Protected Input</div>
+                        <img id="verifyInputImg" src="" alt="Protected Input">
+                    </div>
+
+                    <div class="comp-box" style="border-color: #ef4444;">
+                        <div class="comp-label label-attack">AI Output (Failed)</div>
+                        <img id="verifyOutputImg" src="" alt="AI Output">
+                    </div>
+                </div>
+                <p class="verify-caption" style="margin-top:10px;">
+                    The shield worked if the right image looks distorted, gray, or ignores the prompt.
+                </p>
             </div>
         </div>
 
@@ -108,7 +160,7 @@
 
     <script>
         let currentMode = 'simple';
-        let protectedBlob = null; // Store result for verification
+        let protectedBlob = null; 
 
         const fileInput = document.getElementById('fileInput');
         const apiUrlInput = document.getElementById('apiUrl');
@@ -191,11 +243,12 @@
                 const url = URL.createObjectURL(protectedBlob);
                 
                 document.getElementById('protectedPreview').src = url;
+                document.getElementById('verifyInputImg').src = url; // Pre-load into comparison
                 document.getElementById('downloadLink').href = url;
                 
                 document.getElementById('status').classList.add('hidden');
                 document.getElementById('resultSection').classList.remove('hidden');
-                document.getElementById('verifySection').classList.remove('hidden'); // Show Verify Section
+                document.getElementById('verifySection').classList.remove('hidden'); 
                 immunizeBtn.disabled = false;
                 
             } catch (error) {
@@ -226,7 +279,7 @@
                 if (!response.ok) throw new Error("Verification Failed");
 
                 const blob = await response.blob();
-                document.getElementById('verifyImg').src = URL.createObjectURL(blob);
+                document.getElementById('verifyOutputImg').src = URL.createObjectURL(blob);
                 
                 document.getElementById('verifyStatus').classList.add('hidden');
                 document.getElementById('verifyResult').classList.remove('hidden');
