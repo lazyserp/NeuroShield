@@ -52,14 +52,14 @@
     <div class="container">
         <header>
             <h1>
-                <a href="./index.html" class="logo-link">Image Immunizer 🛡️</a>
+                <a href="./index.html" class="logo-link">Neuro Shield</a>
             </h1>
             <p class="subtitle">Protect your personal photos from AI training and manipulation.</p>
         </header>
 
         <div class="settings-box">
             <i class="ph ph-plug"></i>
-            <input type="text" id="apiUrl" placeholder="Paste Server URL (e.g., https://...ngrok-free.app)" value="">
+            <input type="text" id="apiUrl" placeholder="Paste Server URL" value="">
             <span class="status-dot" id="connectionStatus" title="Disconnected"></span>
         </div>
 
@@ -145,7 +145,7 @@
                     </div>
                 </div>
                 <p class="verify-caption" style="margin-top:10px;">
-                    The shield worked if the right image looks distorted, gray, or ignores the prompt.
+                    The shield worked if the right image looks awfully fake, distorted, gray, or ignores the prompt.
                 </p>
             </div>
         </div>
@@ -225,8 +225,8 @@
             document.getElementById('verifySection').classList.add('hidden');
             
             statusText.innerText = currentMode === 'extreme' 
-                ? "Running Deep Diffusion Gradient Attack (This takes ~20s)..." 
-                : "Applying Fast Adversarial Noise...";
+                ? "Running Deep Diffusion Gradient Attack (This takes longer)..." 
+                : "Applying  Adversarial Noise...";
 
             const formData = new FormData();
             formData.append("file", file);
