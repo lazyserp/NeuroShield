@@ -3,86 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeuroShield | AI Image Immunizer</title>
+    <title>Image Immunizer | Anti-AI Privacy</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
     <div class="container">
-        <h1>NeuroShield 🛡️</h1>
-        <p class="subtitle">Universal Image Immunization Interface</p>
+        <header>
+            <h1>
+                <a href="./index.html" class="logo-link">Image Immunizer 🛡️</a>
+            </h1>
+            <p class="subtitle">Protect your personal photos from AI training and manipulation.</p>
+        </header>
 
         <div class="settings-box">
-            <label for="apiUrl">🔌 Server URL:</label>
-            <input type="text" id="apiUrl" placeholder="Paste Ngrok URL here (e.g., https://xyz.ngrok...)" value="http://127.0.0.1:8000">
+            <i class="ph ph-plug"></i>
+            <input type="text" id="apiUrl" placeholder="Paste Server URL here (e.g., https://...ngrok-free.app)" value="">
             <span class="status-dot" id="connectionStatus" title="Disconnected"></span>
         </div>
 
-        <div class="upload-section">
-            <input type="file" id="fileInput" accept="image/*">
-            <button onclick="uploadImage()" id="protectBtn">Immunize Image</button>
+        <div class="main-card">
+            <div class="upload-area" id="dropZone">
+                <i class="ph ph-upload-simple" style="font-size: 3rem; color: #64748b;"></i>
+                <p>Click to upload or drag & drop</p>
+                <input type="file" id="fileInput" accept="image/*" hidden>
+            </div>
+            
+            <div class="preview-container hidden" id="previewContainer">
+                <img id="originalPreview" src="" alt="Preview">
+            </div>
+
+            <div class="shield-selector">
+                <div class="shield-option selected" onclick="selectShield('simple')" id="btnSimple">
+                    <div class="shield-icon">🛡️</div>
+                    <div class="shield-info">
+                        <strong>Simple Shield</strong>
+                        <span>Standard Protection</span>
+                    </div>
+                </div>
+                
+                <div class="shield-option" onclick="selectShield('extreme')" id="btnExtreme">
+                    <div class="shield-icon">⚔️</div>
+                    <div class="shield-info">
+                        <strong>Extreme Shield</strong>
+                        <span>Pro • GPU Heavy</span>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="processImage()" id="immunizeBtn" disabled>
+                Initialize Protection
+            </button>
         </div>
 
-        <div id="status" class="hidden">Processing... (Engine is calculating)</div>
+        <div id="status" class="hidden">
+            <div class="loader"></div>
+            <p id="statusText">Calculating Adversarial Noise...</p>
+        </div>
 
-        <div class="result-section" id="resultSection">
-            <div class="image-box">
-                <h3>Original</h3>
-                <img id="originalPreview" src="" alt="Original">
+        <div class="result-section hidden" id="resultSection">
+            <div class="success-banner">
+                <i class="ph ph-check-circle"></i> Immunization Complete
             </div>
             <div class="image-box">
-                <h3>Protected</h3>
                 <img id="protectedPreview" src="" alt="Protected">
-                <a id="downloadLink" href="#" download="protected.png" class="btn-download">Download</a>
+                <a id="downloadLink" href="#" download="immunized_photo.png" class="btn-download">
+                    <i class="ph ph-download"></i> Download Protected Image
+                </a>
             </div>
+        </div>
+
+        <div class="info-section">
+            <h2><i class="ph ph-question"></i> Need Help?</h2>
+            <a href="./Work.html" class="btn-secondary">
+                See How This Works
+            </a>
         </div>
     </div>
 
     <script>
+        let currentMode = 'simple';
         const fileInput = document.getElementById('fileInput');
-        const protectBtn = document.getElementById('protectBtn');
-        const status = document.getElementById('status');
-        const resultSection = document.getElementById('resultSection');
         const apiUrlInput = document.getElementById('apiUrl');
-        const connectionStatus = document.getElementById('connectionStatus');
+        const immunizeBtn = document.getElementById('immunizeBtn');
+        const statusText = document.getElementById('statusText');
+        const dropZone = document.getElementById('dropZone');
 
-        // Check connection when URL changes
-        apiUrlInput.addEventListener('input', checkConnection);
-        
-        async function checkConnection() {
-            let url = apiUrlInput.value.replace(/\/$/, ""); // Remove trailing slash
-            try {
-                const res = await fetch(`${url}/`);
-                if (res.ok) {
-                    connectionStatus.style.backgroundColor = "#4ade80"; // Green
-                    connectionStatus.title = "Connected";
-                }
-            } catch (e) {
-                connectionStatus.style.backgroundColor = "#ef4444"; // Red
-                connectionStatus.title = "Disconnected";
+        // Toggle Logic
+        function selectShield(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.shield-option').forEach(el => el.classList.remove('selected'));
+            
+            if(mode === 'simple') {
+                document.getElementById('btnSimple').classList.add('selected');
+                immunizeBtn.innerText = "Initialize Protection (Free)";
+                immunizeBtn.classList.remove('btn-pro');
+            } else {
+                document.getElementById('btnExtreme').classList.add('selected');
+                immunizeBtn.innerText = "Initialize Extreme Shield";
+                immunizeBtn.classList.add('btn-pro');
             }
         }
 
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
+        // Upload Handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        
+        // Drag and Drop Support
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#38bdf8'; });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.style.borderColor = '#475569'; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#475569';
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
             if (file) {
                 document.getElementById('originalPreview').src = URL.createObjectURL(file);
+                document.getElementById('previewContainer').classList.remove('hidden');
+                dropZone.style.display = 'none';
+                immunizeBtn.disabled = false;
+            }
+        }
+
+        // Connection Check
+        apiUrlInput.addEventListener('input', async () => {
+            const url = apiUrlInput.value.replace(/\/$/, "");
+            try {
+                const res = await fetch(`${url}/`);
+                if(res.ok) {
+                    document.getElementById('connectionStatus').style.backgroundColor = "#4ade80";
+                    document.getElementById('connectionStatus').title = "Online";
+                }
+            } catch(e) {
+                document.getElementById('connectionStatus').style.backgroundColor = "#ef4444";
             }
         });
 
-        async function uploadImage() {
+        // Main Process
+        async function processImage() {
             const file = fileInput.files[0];
-            if (!file) return alert("Please select an image first!");
-            
-            // Get URL from the input box
             let baseUrl = apiUrlInput.value.replace(/\/$/, "");
-            if (!baseUrl) return alert("Please enter the Server URL!");
+            
+            if (!baseUrl) return alert("Please enter the Server URL first.");
+            if (!file) return alert("Please upload an image first.");
 
-            protectBtn.disabled = true;
-            status.style.display = 'block';
-            status.innerText = "Sending to Engine...";
+            // UI Updates
+            immunizeBtn.disabled = true;
+            document.getElementById('status').classList.remove('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            
+            statusText.innerText = currentMode === 'extreme' 
+                ? "Running Deep Diffusion Gradient Attack (This takes ~20s)..." 
+                : "Applying Fast Adversarial Noise...";
 
             const formData = new FormData();
             formData.append("file", file);
+            formData.append("mode", currentMode); 
 
             try {
                 const response = await fetch(`${baseUrl}/immunize`, {
@@ -90,21 +168,22 @@
                     body: formData
                 });
 
-                if (!response.ok) throw new Error("Server Error");
+                if (!response.ok) throw new Error("Server Processing Failed");
 
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
                 
                 document.getElementById('protectedPreview').src = url;
                 document.getElementById('downloadLink').href = url;
-                resultSection.style.display = 'flex';
-                status.style.display = 'none';
-
+                
+                document.getElementById('status').classList.add('hidden');
+                document.getElementById('resultSection').classList.remove('hidden');
+                immunizeBtn.disabled = false;
+                
             } catch (error) {
-                console.error(error);
-                status.innerText = "Error: " + error.message;
-            } finally {
-                protectBtn.disabled = false;
+                alert("Error: " + error.message);
+                document.getElementById('status').classList.add('hidden');
+                immunizeBtn.disabled = false;
             }
         }
     </script>
