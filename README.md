@@ -31,7 +31,6 @@ We built Neuro Shield using a client-server architecture powered by **Google Col
 * **AI Engine:** We utilized **Hugging Face Diffusers** and **PyTorch**.
 * For the **Simple Shield**, we target the VAE (Variational Autoencoder) latent space.
 * For the **Extreme Shield**, we perform **Projected Gradient Descent (PGD)** directly against the Stable Diffusion Inpainting UNet.
-* For the **Deplyment ** here is the google Colab link [link](https://colab.research.google.com/drive/1WlabR7g8IefdW6KfGtvzL9m8v44tqA09?usp=sharing)
 
 
 * **Frontend:** We built a custom HTML/CSS interface with a cyberpunk aesthetic to emphasize privacy and security, using vanilla JavaScript for asynchronous API communication.
