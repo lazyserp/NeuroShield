@@ -189,7 +189,7 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 .btn-danger:disabled { background: #451a1a; color: #7f1d1d; box-shadow: none; }
 
 /* =========================================
-   5. CONTACT & PROFILE CARDS (NEW)
+   5. CONTACT & PROFILE CARDS
    ========================================= */
 .profile-grid {
     display: grid;
@@ -266,7 +266,7 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* =========================================
-   7. CYBER NAVIGATION BAR (NEW)
+   7. CYBER NAVIGATION BAR
    ========================================= */
 .cyber-nav {
     display: flex;
@@ -310,7 +310,6 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
-/* Optional: Highlight the Contact link slightly */
 .nav-item.highlight {
     color: #fbbf24;
 }
@@ -324,21 +323,20 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
     .nav-links { gap: 15px; font-size: 0.9rem; }
 }
 
-
 /* =========================================
-   8. DOCS PAGE STYLING (NEW)
+   8. DOCS PAGE STYLING
    ========================================= */
 .doc-section {
-    border: 1px solid #333; /* Subtle border for separation */
+    border: 1px solid #333;
     border-radius: 8px;
     padding: 20px;
-    margin-bottom: 25px; /* Spacing between sections */
-    background: #0a0a0a; /* Darker background inside sections */
+    margin-bottom: 25px;
+    background: #0a0a0a;
     transition: 0.2s;
 }
 
 .doc-section:hover {
-    border-color: #fb64b6; /* Glow pink on hover */
+    border-color: #fb64b6;
     box-shadow: 0 0 15px rgba(251, 100, 182, 0.05);
 }
 
@@ -348,4 +346,85 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
     border-bottom: 1px solid #262626;
     padding-bottom: 10px;
     margin-bottom: 15px;
+}
+
+/* =========================================
+   9. RESULT IMAGE FIX (NEW)
+   ========================================= */
+.image-box {
+    text-align: center;
+    margin: 20px 0;
+    background: #0a0a0a;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #262626;
+}
+
+.image-box img {
+    max-height: 400px; /* Constrains vertical height */
+    max-width: 100%;   /* Fits width */
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    display: inline-block;
+}
+
+/* =========================================
+   10. VERIFICATION INPUT GROUP (NEW)
+   ========================================= */
+.verify-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.verify-header h3 {
+    margin-bottom: 5px;
+    color: #e5e5e5;
+}
+.verify-header p {
+    color: #737373;
+    font-size: 0.9rem;
+    margin-top: 0;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    flex: 1; /* Input takes remaining space */
+    background: #171717;
+    border: 1px solid #333;
+    color: #fb64b6; /* Pink Text */
+    font-family: 'JetBrains Mono', monospace;
+    padding: 12px 15px;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.2s;
+    font-size: 0.95rem;
+}
+
+.input-group input:focus {
+    border-color: #ef4444; /* Red focus */
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+    background: #1a0505; /* Subtle red tint */
+}
+
+.input-group .btn-danger {
+    margin: 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 500px) {
+    .input-group {
+        flex-direction: column;
+    }
+    .input-group .btn-danger {
+        width: 100%;
+    }
 }
