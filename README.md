@@ -19,9 +19,9 @@ While legislation moves slowly, technology moves fast. We were inspired by **MIT
 * **Dual-Tier Protection:**
 * **Simple Shield:** A lightweight defense against basic scraping.
 * **Extreme Shield (Pro):** A heavy-duty, iterative gradient attack designed to break advanced Diffusion models.
-* **So when an AI model tries to modify the image , either the model fails to do so or the edited image looks awfully fake.** 
-
 * **Real-Time Verification:** Unlike other tools, we don't just ask you to trust us. We include a built-in **"Attack Simulation"**. Users can instantly challenge a Stable Diffusion model to edit their protected image, proving the shield's effectiveness in real-time.
+
+ * **SO WHEN AN AI MODEL TRIES TO MODIFY THE IMAGE , EITHER THE MODEL FAILS TO DO SO OR THE EDITED IMAGE LOOKS AWFULLY FAKE.** 
 
 ## How we built it
 
