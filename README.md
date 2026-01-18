@@ -4,19 +4,6 @@
 
 This project cross-platform supported (Local & Google Colab).
 
-## Project Structure
-
--   `backend/`: Contains the Python FastAPI server and core logic.
-    -   `core/`: Model loading, configuration, and attack algorithms.
-    -   `api/`: API endpoint definitions.
--   `frontend/`: Contains the web interface.
-    -   `index.html`: Main UI.
-    -   `js/`: Application logic.
-    -   `css/`: Styling.
-
----
-
-
 ## Inspiration
 
 We are living in an era where our digital photos can be stolen and manipulated without consent. A recent [BBC report](https://www.bbc.com/news/articles/cg7y10xm4x2o) highlighted a terrifying trend: students and everyday individuals are increasingly becoming victims of non-consensual deepfake pornography. This isn't just a celebrity issue anymore; it's a societal crisis.
@@ -31,7 +18,7 @@ While legislation moves slowly, technology moves fast. We were inspired by **MIT
 * **Dual-Tier Protection:**
 * **Simple Shield:** A lightweight defense against basic scraping.
 * **Extreme Shield (Pro):** A heavy-duty, iterative gradient attack designed to break advanced Diffusion models.
-** So when an AI model tries to modify the image , either the model fails to do so or the edited image looks awfully fake.** 
+* **So when an AI model tries to modify the image , either the model fails to do so or the edited image looks awfully fake.** 
 
 * **Real-Time Verification:** Unlike other tools, we don't just ask you to trust us. We include a built-in **"Attack Simulation"**. Users can instantly challenge a Stable Diffusion model to edit their protected image, proving the shield's effectiveness in real-time.
 
@@ -70,6 +57,19 @@ We gained a practical understanding of how **Latent Diffusion Models** extract f
 * **Scalable Cloud Deployment:** Moving from Google Colab to a dedicated GPU cluster (AWS SageMaker or RunPod) to remove the session timeout restrictions.
 * **Multi-User Queueing:** Implementing Redis/Celery to handle thousands of concurrent users without blocking the GPU.
 * **Browser-Side Inference:** Exploring WebGPU to run the "Simple Shield" directly in the user's browser, enhancing privacy by ensuring the original photo never leaves their device.
+
+## Project Structure
+
+-   `backend/`: Contains the Python FastAPI server and core logic.
+    -   `core/`: Model loading, configuration, and attack algorithms.
+    -   `api/`: API endpoint definitions.
+-   `frontend/`: Contains the web interface.
+    -   `index.html`: Main UI.
+    -   `js/`: Application logic.
+    -   `css/`: Styling.
+
+---
+
 
 
 ## 🚀 How to Run
