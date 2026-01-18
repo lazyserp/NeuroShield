@@ -7,53 +7,36 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        /* INLINE STYLES FOR COMPARISON SLIDER */
-        .comparison-container {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: center;
-            align-items: stretch;
-        }
-        .comp-box {
-            flex: 1;
-            background: #0a0a0a;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-        }
-        .comp-box img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-            object-fit: cover; 
-            flex-grow: 1;
-            border: 1px solid #262626;
-        }
-        .comp-label {
-            font-size: 0.75rem;
+        /* STATUS BADGE STYLING */
+        .status-badge {
             font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
             font-weight: bold;
-            margin-bottom: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            margin-left: auto; /* Push to right */
+            white-space: nowrap;
         }
+        .status-offline { background: #451a1a; color: #ef4444; border: 1px solid #7f1d1d; }
+        .status-online { background: #064e3b; color: #34d399; border: 1px solid #065f46; box-shadow: 0 0 10px rgba(52, 211, 153, 0.2); }
+        .status-checking { background: #422006; color: #fcd34d; border: 1px solid #78350f; }
+
+        .comparison-container { display: flex; gap: 10px; margin-top: 15px; justify-content: center; align-items: stretch; }
+        .comp-box { flex: 1; background: #0a0a0a; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid #333; display: flex; flex-direction: column; }
+        .comp-box img { width: 100%; height: auto; border-radius: 4px; object-fit: cover; flex-grow: 1; border: 1px solid #262626; }
+        .comp-label { font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         .label-shield { color: #fb64b6; text-shadow: 0 0 10px rgba(251, 100, 182, 0.4); }
         .label-attack { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
-        
-        @media (max-width: 500px) {
-            .comparison-container { flex-direction: column; }
-        }
+        @media (max-width: 500px) { .comparison-container { flex-direction: column; } }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <nav class="cyber-nav">
-                <a href="./index.html" class="nav-item active>
+                <a href="./index.html" class="nav-item active">
                     <i class="ph ph-shield-check"></i> Neuro Shield
                 </a>
                 <div class="nav-links">
@@ -62,26 +45,23 @@
                     <a href="./contact.html" class="nav-item ">Contact</a>
                 </div>
             </nav>
-            <h1>
-                <a href="./index.html" class="logo-link">Neuro Shield</a>
-            </h1>
+            <h1><a href="./index.html" class="logo-link">Neuro Shield</a></h1>
             <p class="subtitle">Secure your digital identity against AI training.</p>
-            
         </header>
 
         <div class="judge-banner">
             <i class="ph ph-warning-circle" style="font-size: 1.2rem;"></i>
             <div>
-                <strong>Judge's Notice:</strong> High-Performance Cloud GPUs are expensive. The server is not running 24/7. It is done to minimise costs. 
-                <br>
-                To test live, please ping me at: <span style="color: #fb64b6;"><a href="https://x.com/hazybishop" target="_blank"> Aman's X ( formerly Twitter)</a></span>
+                <strong>Judge's Notice:</strong> High-Performance Cloud GPUs are expensive. The server is not running 24/7.
+                <br>To test live, ping me at: <span style="color: #fb64b6;"><a href="https://x.com/hazybishop" target="_blank">Aman's X</a></span>
             </div>
         </div>
 
         <div class="settings-box">
             <i class="ph ph-plug"></i>
-            <input type="text" id="apiUrl" placeholder="Kindly ping me for server URL and paste it here." value="">
-            <span class="status-dot" id="connectionStatus" title="Disconnected"></span>
+            <input type="text" id="apiUrl" placeholder="Paste Server URL here (e.g., https://xyz.ngrok...)" value="">
+            
+            <div id="serverStatusBadge" class="status-badge status-offline">SERVER OFFLINE</div>
         </div>
 
         <div class="main-card">
@@ -98,24 +78,15 @@
             <div class="shield-selector">
                 <div class="shield-option selected" onclick="selectShield('simple')" id="btnSimple">
                     <div class="shield-icon"><i class="ph ph-lock-key"></i></div>
-                    <div class="shield-info">
-                        <strong>Simple Shield</strong>
-                        <span>Standard Protection</span>
-                    </div>
+                    <div class="shield-info"><strong>Simple Shield</strong><span>Standard Protection</span></div>
                 </div>
-                
                 <div class="shield-option locked" onclick="showLockMessage()" id="btnExtreme">
                     <div class="shield-icon"><i class="ph ph-shield-star"></i></div>
-                    <div class="shield-info">
-                        <strong>Extreme Shield</strong>
-                        <span>Pro • GPU Heavy</span>
-                    </div>
+                    <div class="shield-info"><strong>Extreme Shield</strong><span>Pro • GPU Heavy</span></div>
                 </div>
             </div>
 
-            <button onclick="processImage()" id="immunizeBtn" disabled>
-                Initialize Protection
-            </button>
+            <button onclick="processImage()" id="immunizeBtn" disabled>Initialize Protection</button>
         </div>
 
         <div id="status" class="hidden">
@@ -129,9 +100,7 @@
             </div>
             <div class="image-box">
                 <img id="protectedPreview" src="" alt="Protected">
-                <a id="downloadLink" href="#" download="immunized_photo.png" class="btn-download">
-                    <i class="ph ph-download"></i> Download Protected Image
-                </a>
+                <a id="downloadLink" href="#" download="immunized_photo.png" class="btn-download"><i class="ph ph-download"></i> Download Protected Image</a>
             </div>
         </div>
 
@@ -140,42 +109,31 @@
                 <h3><i class="ph ph-robot"></i> Verify Robustness</h3>
                 <p>Challenge a real AI to manipulate this image.</p>
             </div>
-            
             <div class="input-group">
                 <input type="text" id="verifyPrompt" placeholder="Prompt..." value="Make this person look like a cyborg">
-                <button onclick="runVerification()" id="verifyBtn" class="btn-danger">
-                    ATTACK
-                </button>
+                <button onclick="runVerification()" id="verifyBtn" class="btn-danger">ATTACK</button>
             </div>
-
             <div id="verifyStatus" class="hidden" style="margin-top: 15px; text-align: center;">
                 <div class="loader" style="width: 15px; height: 15px; border-top-color: #ef4444;"></div>
                 <p style="font-size: 0.8rem; color: #ef4444; font-family: 'JetBrains Mono';">Attacking Image...</p>
             </div>
-
             <div class="verify-result hidden" id="verifyResult">
                 <div class="comparison-container">
                     <div class="comp-box">
                         <div class="comp-label label-shield">Protected Input</div>
                         <img id="verifyInputImg" src="" alt="Protected Input">
                     </div>
-
                     <div class="comp-box" style="border-color: #ef4444;">
                         <div class="comp-label label-attack">AI Output (Failed)</div>
                         <img id="verifyOutputImg" src="" alt="AI Output">
                     </div>
                 </div>
-                <p class="verify-caption" style="margin-top:10px;">
-                    Success: The AI failed to interpret the image content.
-                </p>
+                <p class="verify-caption" style="margin-top:10px;">Success: The AI failed to interpret the image content.</p>
             </div>
         </div>
-
         <div class="info-section">
             <h2><i class="ph ph-terminal-window"></i> System Info</h2>
-            <a href="./docs.html" class="btn-secondary">
-                View Documentation
-            </a>
+            <a href="./docs.html" class="btn-secondary">View Documentation</a>
         </div>
     </div>
 
@@ -188,17 +146,53 @@
         const immunizeBtn = document.getElementById('immunizeBtn');
         const statusText = document.getElementById('statusText');
         const dropZone = document.getElementById('dropZone');
+        
+        // NEW: Status Badge Element
+        const statusBadge = document.getElementById('serverStatusBadge');
+
+        // LOGIC: Check Server Status when typing stops
+        let typingTimer;
+        apiUrlInput.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            statusBadge.innerText = "CHECKING...";
+            statusBadge.className = "status-badge status-checking";
+            
+            typingTimer = setTimeout(checkServerHealth, 500);
+        });
+
+        async function checkServerHealth() {
+            const url = apiUrlInput.value.trim().replace(/\/$/, "");
+            if (!url) {
+                statusBadge.innerText = "SERVER OFFLINE";
+                statusBadge.className = "status-badge status-offline";
+                return;
+            }
+
+            try {
+                const res = await fetch(`${url}/`);
+                if(res.ok) {
+                    statusBadge.innerText = "SERVER ONLINE";
+                    statusBadge.className = "status-badge status-online";
+                } else {
+                    throw new Error("Server Error");
+                }
+            } catch(e) {
+                statusBadge.innerText = "SERVER OFFLINE";
+                statusBadge.className = "status-badge status-offline";
+            }
+        }
+
+        // --- Standard Logic Below ---
 
         function selectShield(mode) {
             currentMode = mode;
-            // Only simple mode logic here since Extreme is locked
             document.getElementById('btnSimple').classList.add('selected');
             immunizeBtn.innerText = "Initialize Protection (Free)";
             immunizeBtn.classList.remove('btn-pro');
         }
 
         function showLockMessage() {
-            alert("🔒 PRO FEATURE LOCKED\n\nTo keep Neuro Shield free, we use lightweight servers. 'Extreme Shield' requires massive NVIDIA H200 NVL GPU clusters to run complex iterative attacks against advanced models like Grok or ChatGPT.\n\nThis feature is currently disabled to save costs. Please support the project to unlock full server capacity!");
+            alert("🔒 PRO FEATURE LOCKED\n\nTo keep Neuro Shield free, we use lightweight servers. 'Extreme Shield' requires massive NVIDIA H200 NVL GPU clusters.\n\nPlease support the project to unlock full server capacity!");
         }
 
         dropZone.addEventListener('click', () => fileInput.click());
@@ -220,21 +214,6 @@
             }
         }
 
-        apiUrlInput.addEventListener('input', async () => {
-            const url = apiUrlInput.value.replace(/\/$/, "");
-            try {
-                const res = await fetch(`${url}/`);
-                if(res.ok) {
-                    document.getElementById('connectionStatus').style.backgroundColor = "#4ade80";
-                    document.getElementById('connectionStatus').style.boxShadow = "0 0 10px #4ade80";
-                    document.getElementById('connectionStatus').title = "Online";
-                }
-            } catch(e) {
-                document.getElementById('connectionStatus').style.backgroundColor = "#ef4444";
-                document.getElementById('connectionStatus').style.boxShadow = "0 0 10px #ef4444";
-            }
-        });
-
         async function processImage() {
             const file = fileInput.files[0];
             let baseUrl = apiUrlInput.value.replace(/\/$/, "");
@@ -249,13 +228,10 @@
 
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("mode", "simple"); // Force Simple mode since pro is locked
+            formData.append("mode", "simple"); 
 
             try {
-                const response = await fetch(`${baseUrl}/immunize`, {
-                    method: "POST",
-                    body: formData
-                });
+                const response = await fetch(`${baseUrl}/immunize`, { method: "POST", body: formData });
                 if (!response.ok) throw new Error("Processing Failed");
 
                 protectedBlob = await response.blob();
@@ -291,10 +267,7 @@
             formData.append("prompt", prompt);
 
             try {
-                const response = await fetch(`${baseUrl}/verify`, {
-                    method: "POST",
-                    body: formData
-                });
+                const response = await fetch(`${baseUrl}/verify`, { method: "POST", body: formData });
                 if (!response.ok) throw new Error("Verification Failed");
 
                 const blob = await response.blob();
