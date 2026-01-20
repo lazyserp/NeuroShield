@@ -8,16 +8,20 @@ body {
     background-color: #0a0a0a; /* Void Black */
     color: #e5e5e5;
     margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
+    padding: 0; /* Reset padding */
     min-height: 100vh;
-    font-size: 17px;
+    display: flex;
+    flex-direction: column; /* Fixes scrolling on long pages */
+    align-items: center;
+    font-size: 16px; /* Slightly smaller base for better reading */
 }
 
+/* Wrapper to add padding without breaking full-width layouts */
 .container {
     max-width: 700px;
-    width: 100%;
+    width: 90%; /* Better mobile responsiveness */
+    margin: 40px 0;
+    flex: 1;
 }
 
 a { text-decoration: none; color: inherit; transition: 0.2s; }
@@ -29,6 +33,7 @@ h1, h2, h3, .shield-info strong, .judge-banner strong, .profile-name {
 }
 
 h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
+h2 { font-size: 1.5rem; margin-top: 0; }
 
 /* Logo: Neon Pink */
 .logo-link { 
@@ -37,7 +42,7 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
 }
 .logo-link:hover { color: #ff85c8; }
 
-.subtitle { color: #737373; text-align: center; margin-top: 5px; font-size: 1rem; }
+.subtitle { color: #737373; text-align: center; margin-top: 5px; font-size: 1rem; margin-bottom: 30px; }
 
 /* Main Card */
 .main-card {
@@ -51,15 +56,14 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
 }
 
 /* =========================================
-   2. JUDGE NOTICE
+   2. JUDGE & INFO SECTIONS
    ========================================= */
 .judge-banner {
     background: #1a1a0a;
     border: 1px solid #fbbf24;
     border-radius: 10px;
     padding: 18px;
-    margin-top: 25px;
-    margin-bottom: 25px;
+    margin: 25px 0;
     display: flex;
     align-items: flex-start;
     gap: 15px;
@@ -69,11 +73,30 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
 }
 .judge-banner i { color: #fbbf24; margin-top: 3px; font-size: 1.3rem; }
 
+/* Info Section (For Docs/Contact text) */
+.info-section {
+    background: #111111;
+    border: 1px solid #262626;
+    border-radius: 14px;
+    padding: 30px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.doc-section {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #262626;
+    padding-bottom: 20px;
+}
+.doc-section:last-child { border-bottom: none; }
+.doc-section h3 { text-align: left; color: #fb64b6; margin-bottom: 10px; }
+.doc-section p { color: #a3a3a3; margin: 0; }
+
 /* =========================================
-   3. COMPONENTS 
+   3. COMPONENTS (DASHBOARD)
    ========================================= */
 
-/* Settings Bar (New Automation Styles) */
+/* Settings Bar */
 .settings-box { 
     display: flex; align-items: center; gap: 12px; 
     background: #171717; padding: 12px 15px; 
@@ -97,34 +120,18 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
 .status-online { background: #064e3b; color: #34d399; border: 1px solid #065f46; box-shadow: 0 0 10px rgba(52, 211, 153, 0.2); }
 .status-checking { background: #422006; color: #fcd34d; border: 1px solid #78350f; }
 
-/* Activate Button */
+/* Buttons & Inputs */
 .btn-activate {
-    background: #262626;
-    color: #fff;
-    border: 1px solid #404040;
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: auto;
-    margin: 0;
-    cursor: pointer;
-    border-radius: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    transition: 0.2s;
+    background: #262626; color: #fff; border: 1px solid #404040;
+    padding: 10px 20px; font-size: 0.9rem; display: flex;
+    align-items: center; justify-content: center; gap: 10px;
+    width: auto; margin: 0; cursor: pointer; border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace; transition: 0.2s;
 }
-.btn-activate:hover {
-    background: #333;
-    border-color: #fb64b6;
-    color: #fb64b6;
-}
+.btn-activate:hover { background: #333; border-color: #fb64b6; color: #fb64b6; }
 .btn-activate.pulsing {
-    animation: pulse-pink 2s infinite;
-    background: #4a1d2f;
-    border-color: #fb64b6;
-    color: #fb64b6;
+    animation: pulse-pink 2s infinite; background: #4a1d2f;
+    border-color: #fb64b6; color: #fb64b6;
 }
 @keyframes pulse-pink {
     0% { box-shadow: 0 0 0 0 rgba(251, 100, 182, 0.4); }
@@ -132,15 +139,9 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
     100% { box-shadow: 0 0 0 0 rgba(251, 100, 182, 0); }
 }
 
-/* Upload Area */
 .upload-area {
-    border: 2px dashed #404040;
-    border-radius: 10px;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.2s;
-    background: #0a0a0a;
+    border: 2px dashed #404040; border-radius: 10px; padding: 40px;
+    text-align: center; cursor: pointer; transition: 0.2s; background: #0a0a0a;
 }
 .upload-area:hover { background: #171717; border-color: #fb64b6; }
 .upload-area i { color: #525252; transition: 0.2s; font-size: 3.5rem; }
@@ -150,91 +151,102 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
 .preview-container img { max-height: 250px; border-radius: 10px; border: 1px solid #404040; }
 
 /* Shield Selector */
-.shield-selector {
-    display: flex; gap: 15px; margin: 25px 0;
-}
-
+.shield-selector { display: flex; gap: 15px; margin: 25px 0; }
 .shield-option {
-    flex: 1;
-    background: #0a0a0a;
-    border: 1px solid #262626;
-    border-radius: 10px;
-    padding: 15px;
-    display: flex; align-items: center; gap: 12px;
-    cursor: pointer; transition: 0.2s; opacity: 0.6;
+    flex: 1; background: #0a0a0a; border: 1px solid #262626;
+    border-radius: 10px; padding: 15px; display: flex; align-items: center;
+    gap: 12px; cursor: pointer; transition: 0.2s; opacity: 0.6;
 }
-
 .shield-option.selected {
-    border-color: #fb64b6;
-    background: #111111;
-    opacity: 1;
+    border-color: #fb64b6; background: #111111; opacity: 1;
     box-shadow: 0 0 15px rgba(251, 100, 182, 0.1);
 }
-
-.shield-option.locked {
-    opacity: 0.4;
-    cursor: not-allowed;
-    border-color: #333;
-    position: relative;
-}
-.shield-option.locked:hover {
-    border-color: #fbbf24;
-    opacity: 0.7;
-}
-
+.shield-option.locked { opacity: 0.4; cursor: not-allowed; border-color: #333; position: relative; }
 .shield-icon { font-size: 1.8rem; }
-.shield-info strong { display: block; color: #fff; font-size: 0.95rem; letter-spacing: -0.5px; }
+.shield-info strong { display: block; color: #fff; font-size: 0.95rem; }
 .shield-info span { font-size: 0.8rem; color: #737373; font-family: 'Inter', sans-serif; }
 
 /* =========================================
-   4. BUTTONS
+   4. CONTACT & DOCS SPECIFIC (NEW)
+   ========================================= */
+
+/* Comparison Table in Docs */
+.comparison-table {
+    display: flex; gap: 15px; margin-top: 15px;
+}
+.comp-col {
+    flex: 1; background: #0a0a0a; border: 1px solid #333;
+    padding: 15px; border-radius: 8px; font-size: 0.9rem;
+}
+.comp-col.pro { border-color: #fbbf24; }
+.comp-col strong { display: block; margin-bottom: 5px; font-size: 1rem; }
+.comp-col ul { list-style-type: square; }
+
+/* Profile Grid in Contact */
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+.profile-card {
+    background: #0a0a0a;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: 0.2s;
+}
+.profile-card:hover {
+    border-color: #fb64b6;
+    transform: translateY(-2px);
+}
+.profile-icon {
+    font-size: 4rem; color: #fb64b6; margin-bottom: 10px;
+}
+.profile-name {
+    font-size: 1.2rem; margin-bottom: 5px; font-weight: bold;
+}
+.profile-role {
+    display: inline-block; font-size: 0.75rem; padding: 4px 8px;
+    background: #262626; color: #fbbf24; border-radius: 4px;
+    margin-bottom: 15px; border: 1px solid #444;
+}
+.social-links {
+    display: flex; justify-content: center; gap: 10px;
+}
+.social-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #171717; color: #737373;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #333; font-size: 1.2rem;
+}
+.social-btn:hover {
+    background: #fb64b6; color: #000; border-color: #fb64b6;
+}
+
+/* =========================================
+   5. BUTTONS & UTILITIES
    ========================================= */
 button, .btn-secondary, .btn-download, .btn-danger {
     display: block; width: 100%; text-align: center;
-    border: none; padding: 16px;
-    font-weight: 700; font-family: 'JetBrains Mono', monospace;
-    text-transform: uppercase; letter-spacing: 0.5px;
-    cursor: pointer; border-radius: 8px;
-    font-size: 1rem; box-sizing: border-box;
-    transition: 0.2s;
+    border: none; padding: 16px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
+    letter-spacing: 0.5px; cursor: pointer; border-radius: 8px;
+    font-size: 1rem; box-sizing: border-box; transition: 0.2s;
 }
-
-/* Standard Button (Pink) */
-button {
-    background-color: #fb64b6;
-    color: #000;
-}
-button:hover {
-    background-color: #ff85c8;
-    box-shadow: 0 0 15px rgba(251, 100, 182, 0.4);
-}
+button { background-color: #fb64b6; color: #000; }
+button:hover { background-color: #ff85c8; box-shadow: 0 0 15px rgba(251, 100, 182, 0.4); }
 button:disabled { background-color: #404040; color: #737373; cursor: not-allowed; box-shadow: none; }
 
-/* Secondary Buttons */
-.btn-secondary {
-    background-color: transparent;
-    border: 1px solid #fb64b6;
-    color: #fb64b6;
-    margin-top: 15px;
-}
-.btn-secondary:hover { background-color: rgba(251, 100, 182, 0.1); }
-
-.btn-download {
-    background: #262626; color: #fb64b6; margin-top: 20px;
-}
+.btn-secondary { background: transparent; border: 1px solid #fb64b6; color: #fb64b6; margin-top: 15px; }
+.btn-secondary:hover { background: rgba(251, 100, 182, 0.1); }
+.btn-download { background: #262626; color: #fb64b6; margin-top: 20px; }
 .btn-download:hover { background: #333; }
-
-/* Attack Button (Red) */
-.btn-danger {
-    background: #ef4444; color: black;
-    width: auto; padding: 12px 30px;
-}
+.btn-danger { background: #ef4444; color: black; width: auto; padding: 12px 30px; }
 .btn-danger:hover { background: #f87171; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
 .btn-danger:disabled { background: #451a1a; color: #7f1d1d; box-shadow: none; }
 
-/* =========================================
-   5. UTILITIES
-   ========================================= */
 .hidden { display: none !important; }
 .loader { 
     border: 3px solid #262626; border-top: 3px solid #fb64b6; 
@@ -247,112 +259,44 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
    6. CYBER NAVIGATION BAR
    ========================================= */
 .cyber-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #262626;
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #262626;
 }
-
-.nav-links {
-    display: flex;
-    gap: 20px;
-}
-
+.nav-links { display: flex; gap: 20px; }
 .nav-item {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    color: #737373;
-    text-decoration: none;
-    transition: 0.2s;
-    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+    color: #737373; transition: 0.2s; text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+.nav-item:hover, .nav-item.active { color: #e5e5e5; text-shadow: 0 0 8px rgba(255, 255, 255, 0.2); }
+.nav-item.highlight { color: #fbbf24; }
+.nav-item.highlight:hover { color: #fcd34d; text-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
 
-.nav-item:hover, .nav-item.active {
-    color: #e5e5e5;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-}
-
-.nav-item.highlight {
-    color: #fbbf24;
-}
-.nav-item.highlight:hover {
-    color: #fcd34d;
-    text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
-}
-
+/* Mobile Adjustments */
 @media (max-width: 500px) {
     .cyber-nav { flex-direction: column; gap: 15px; }
     .nav-links { gap: 15px; font-size: 0.9rem; }
+    .shield-selector { flex-direction: column; }
+    .comparison-table { flex-direction: column; }
+    .settings-box { flex-direction: column; align-items: stretch; text-align: center; }
+    .status-badge { margin: 10px auto 0 auto; width: 100%; text-align: center; }
 }
 
 /* =========================================
-   7. VERIFICATION INPUT GROUP
+   7. VERIFICATION GROUP
    ========================================= */
-.verify-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-.verify-header h3 {
-    margin-bottom: 5px;
-    color: #e5e5e5;
-}
-.verify-header p {
-    color: #737373;
-    font-size: 0.9rem;
-    margin-top: 0;
-}
-
-.input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
+.verify-header { text-align: center; margin-bottom: 20px; }
+.verify-header h3 { margin-bottom: 5px; color: #e5e5e5; }
+.verify-header p { color: #737373; font-size: 0.9rem; margin-top: 0; }
+.input-group { display: flex; gap: 10px; margin-bottom: 15px; }
 .input-group input {
-    flex: 1;
-    background: #171717;
-    border: 1px solid #333;
-    color: #fb64b6;
-    font-family: 'JetBrains Mono', monospace;
-    padding: 12px 15px;
-    border-radius: 8px;
-    outline: none;
-    transition: 0.2s;
-    font-size: 0.95rem;
+    flex: 1; background: #171717; border: 1px solid #333; color: #fb64b6;
+    font-family: 'JetBrains Mono', monospace; padding: 12px 15px;
+    border-radius: 8px; outline: none; transition: 0.2s; font-size: 0.95rem;
 }
-
-.input-group input:focus {
-    border-color: #ef4444;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
-    background: #1a0505;
-}
-
-.input-group .btn-danger {
-    margin: 0;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
+.input-group input:focus { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); background: #1a0505; }
 .image-box {
-    text-align: center;
-    margin: 20px 0;
-    background: #0a0a0a;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #262626;
+    text-align: center; margin: 20px 0; background: #0a0a0a; padding: 10px;
+    border-radius: 10px; border: 1px solid #262626;
 }
-
-.image-box img {
-    max-height: 400px;
-    max-width: 100%;
-    width: auto;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    display: inline-block;
-}
+.image-box img { max-height: 400px; max-width: 100%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
