@@ -12,11 +12,11 @@ body {
     display: flex;
     justify-content: center;
     min-height: 100vh;
-    font-size: 17px; /* Bumped up for "110%" feel */
+    font-size: 17px;
 }
 
 .container {
-    max-width: 700px; /* Increased from 600px */
+    max-width: 700px;
     width: 100%;
 }
 
@@ -43,8 +43,8 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
 .main-card {
     background: #111111;
     border: 1px solid #262626;
-    border-radius: 14px; /* Slightly rounder */
-    padding: 25px;       /* More breathing room */
+    border-radius: 14px;
+    padding: 25px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.8);
     margin-bottom: 25px;
     transition: all 0.3s ease;
@@ -73,20 +73,64 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
    3. COMPONENTS 
    ========================================= */
 
-/* Settings Bar */
+/* Settings Bar (New Automation Styles) */
 .settings-box { 
     display: flex; align-items: center; gap: 12px; 
     background: #171717; padding: 12px 15px; 
     border: 1px solid #262626; border-radius: 8px; 
     margin-bottom: 20px; 
 }
-.settings-box input { 
-    background: transparent; border: none; 
-    color: #fb64b6; font-family: 'JetBrains Mono', monospace;
-    width: 100%; outline: none; font-size: 0.95rem;
+.server-controls { flex-grow: 1; }
+
+.status-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: auto;
+    white-space: nowrap;
 }
-.settings-box i { color: #525252; font-size: 1.2rem; }
-.status-dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; box-shadow: 0 0 5px #10b981; }
+.status-offline { background: #451a1a; color: #ef4444; border: 1px solid #7f1d1d; }
+.status-online { background: #064e3b; color: #34d399; border: 1px solid #065f46; box-shadow: 0 0 10px rgba(52, 211, 153, 0.2); }
+.status-checking { background: #422006; color: #fcd34d; border: 1px solid #78350f; }
+
+/* Activate Button */
+.btn-activate {
+    background: #262626;
+    color: #fff;
+    border: 1px solid #404040;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    transition: 0.2s;
+}
+.btn-activate:hover {
+    background: #333;
+    border-color: #fb64b6;
+    color: #fb64b6;
+}
+.btn-activate.pulsing {
+    animation: pulse-pink 2s infinite;
+    background: #4a1d2f;
+    border-color: #fb64b6;
+    color: #fb64b6;
+}
+@keyframes pulse-pink {
+    0% { box-shadow: 0 0 0 0 rgba(251, 100, 182, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(251, 100, 182, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(251, 100, 182, 0); }
+}
 
 /* Upload Area */
 .upload-area {
@@ -145,7 +189,7 @@ h1 { text-align: center; margin-bottom: 5px; font-size: 2.2rem; }
 /* =========================================
    4. BUTTONS
    ========================================= */
-button, .btn-secondary, .btn-download, .btn-danger, .btn-social {
+button, .btn-secondary, .btn-download, .btn-danger {
     display: block; width: 100%; text-align: center;
     border: none; padding: 16px;
     font-weight: 700; font-family: 'JetBrains Mono', monospace;
@@ -189,73 +233,7 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 .btn-danger:disabled { background: #451a1a; color: #7f1d1d; box-shadow: none; }
 
 /* =========================================
-   5. CONTACT & PROFILE CARDS
-   ========================================= */
-.profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-top: 20px;
-}
-.profile-card {
-    background: #0a0a0a;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    transition: 0.2s;
-}
-.profile-card:hover {
-    border-color: #fb64b6;
-    box-shadow: 0 0 15px rgba(251, 100, 182, 0.1);
-}
-.profile-icon {
-    font-size: 3rem;
-    color: #525252;
-    margin-bottom: 10px;
-}
-.profile-name {
-    color: #fff;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-}
-.profile-role {
-    color: #fb64b6;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 20px;
-}
-.social-links {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-.social-btn {
-    background: #171717;
-    color: #a3a3a3;
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    transition: 0.2s;
-    border: 1px solid #262626;
-}
-.social-btn:hover {
-    color: #fb64b6;
-    border-color: #fb64b6;
-    background: #0a0a0a;
-}
-
-@media (max-width: 600px) {
-    .profile-grid { grid-template-columns: 1fr; }
-}
-
-/* =========================================
-   6. UTILITIES
+   5. UTILITIES
    ========================================= */
 .hidden { display: none !important; }
 .loader { 
@@ -266,7 +244,7 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* =========================================
-   7. CYBER NAVIGATION BAR
+   6. CYBER NAVIGATION BAR
    ========================================= */
 .cyber-nav {
     display: flex;
@@ -276,19 +254,6 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
     margin-bottom: 20px;
     border-bottom: 1px solid #262626;
 }
-
-.nav-brand {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #fb64b6;
-    text-shadow: 0 0 10px rgba(251, 100, 182, 0.3);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.nav-brand:hover { color: #ff85c8; }
 
 .nav-links {
     display: flex;
@@ -324,54 +289,7 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 }
 
 /* =========================================
-   8. DOCS PAGE STYLING
-   ========================================= */
-.doc-section {
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 25px;
-    background: #0a0a0a;
-    transition: 0.2s;
-}
-
-.doc-section:hover {
-    border-color: #fb64b6;
-    box-shadow: 0 0 15px rgba(251, 100, 182, 0.05);
-}
-
-.doc-section h3 {
-    margin-top: 0;
-    color: #fb64b6;
-    border-bottom: 1px solid #262626;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-}
-
-/* =========================================
-   9. RESULT IMAGE FIX (NEW)
-   ========================================= */
-.image-box {
-    text-align: center;
-    margin: 20px 0;
-    background: #0a0a0a;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #262626;
-}
-
-.image-box img {
-    max-height: 400px; /* Constrains vertical height */
-    max-width: 100%;   /* Fits width */
-    width: auto;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    display: inline-block;
-}
-
-/* =========================================
-   10. VERIFICATION INPUT GROUP (NEW)
+   7. VERIFICATION INPUT GROUP
    ========================================= */
 .verify-header {
     text-align: center;
@@ -394,10 +312,10 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 }
 
 .input-group input {
-    flex: 1; /* Input takes remaining space */
+    flex: 1;
     background: #171717;
     border: 1px solid #333;
-    color: #fb64b6; /* Pink Text */
+    color: #fb64b6;
     font-family: 'JetBrains Mono', monospace;
     padding: 12px 15px;
     border-radius: 8px;
@@ -407,9 +325,9 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
 }
 
 .input-group input:focus {
-    border-color: #ef4444; /* Red focus */
+    border-color: #ef4444;
     box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
-    background: #1a0505; /* Subtle red tint */
+    background: #1a0505;
 }
 
 .input-group .btn-danger {
@@ -420,11 +338,21 @@ button:disabled { background-color: #404040; color: #737373; cursor: not-allowed
     justify-content: center;
 }
 
-@media (max-width: 500px) {
-    .input-group {
-        flex-direction: column;
-    }
-    .input-group .btn-danger {
-        width: 100%;
-    }
+.image-box {
+    text-align: center;
+    margin: 20px 0;
+    background: #0a0a0a;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #262626;
+}
+
+.image-box img {
+    max-height: 400px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    display: inline-block;
 }

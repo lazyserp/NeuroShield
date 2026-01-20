@@ -7,22 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        /* STATUS BADGE STYLING */
-        .status-badge {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-left: auto; /* Push to right */
-            white-space: nowrap;
-        }
-        .status-offline { background: #451a1a; color: #ef4444; border: 1px solid #7f1d1d; }
-        .status-online { background: #064e3b; color: #34d399; border: 1px solid #065f46; box-shadow: 0 0 10px rgba(52, 211, 153, 0.2); }
-        .status-checking { background: #422006; color: #fcd34d; border: 1px solid #78350f; }
-
+        /* INLINE COMPONENT STYLES */
         .comparison-container { display: flex; gap: 10px; margin-top: 15px; justify-content: center; align-items: stretch; }
         .comp-box { flex: 1; background: #0a0a0a; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid #333; display: flex; flex-direction: column; }
         .comp-box img { width: 100%; height: auto; border-radius: 4px; object-fit: cover; flex-grow: 1; border: 1px solid #262626; }
@@ -52,16 +37,20 @@
         <div class="judge-banner">
             <i class="ph ph-warning-circle" style="font-size: 1.2rem;"></i>
             <div>
-                <strong>Judge's Notice:</strong> High-Performance Cloud GPUs are expensive. The server is not running 24/7.
-                <br>To test live, ping me at: <span style="color: #fb64b6;"><a href="https://x.com/hazybishop" target="_blank">Aman's X</a></span>
+                <strong>Judge's Notice:</strong> The GPU server enters sleep mode to save costs. 
+                <br>Click 'Activate Server' below to wake the connection.
             </div>
         </div>
 
         <div class="settings-box">
-            <i class="ph ph-plug"></i>
-            <input type="text" id="apiUrl" placeholder="Paste Server URL here (e.g., https://xyz.ngrok...)" value="">
+            <div class="server-controls">
+                <button id="activateBtn" onclick="activateServer()" class="btn-activate">
+                    <i class="ph ph-lightning"></i> ACTIVATE SERVER
+                </button>
+                <input type="hidden" id="apiUrl" value="">
+            </div>
             
-            <div id="serverStatusBadge" class="status-badge status-offline">SERVER OFFLINE</div>
+            <div id="serverStatusBadge" class="status-badge status-offline">DISCONNECTED</div>
         </div>
 
         <div class="main-card">
@@ -138,51 +127,82 @@
     </div>
 
     <script>
-        let currentMode = 'simple';
-        let protectedBlob = null; 
+        // --- AUTO-CONNECTION LOGIC ---
+        const SIGNAL_RELAY_ID = "267fff7f59144ba13252"; 
+        const RELAY_URL = `https://api.npoint.io/${SIGNAL_RELAY_ID}`;
 
-        const fileInput = document.getElementById('fileInput');
-        const apiUrlInput = document.getElementById('apiUrl');
-        const immunizeBtn = document.getElementById('immunizeBtn');
-        const statusText = document.getElementById('statusText');
-        const dropZone = document.getElementById('dropZone');
-        
-        // NEW: Status Badge Element
+        const activateBtn = document.getElementById('activateBtn');
         const statusBadge = document.getElementById('serverStatusBadge');
+        const apiUrlInput = document.getElementById('apiUrl');
 
-        // LOGIC: Check Server Status when typing stops
-        let typingTimer;
-        apiUrlInput.addEventListener('input', () => {
-            clearTimeout(typingTimer);
-            statusBadge.innerText = "CHECKING...";
-            statusBadge.className = "status-badge status-checking";
-            
-            typingTimer = setTimeout(checkServerHealth, 500);
-        });
-
-        async function checkServerHealth() {
-            const url = apiUrlInput.value.trim().replace(/\/$/, "");
-            if (!url) {
-                statusBadge.innerText = "SERVER OFFLINE";
-                statusBadge.className = "status-badge status-offline";
-                return;
-            }
+        async function activateServer() {
+            activateBtn.disabled = true;
+            activateBtn.innerHTML = '<div class="loader" style="width:15px;height:15px;border-width:2px;margin:0;"></div> CONNECTING...';
+            activateBtn.classList.add('pulsing');
+            statusBadge.className = 'status-badge status-checking';
+            statusBadge.innerText = "SEARCHING SIGNAL...";
 
             try {
-                const res = await fetch(`${url}/`);
-                if(res.ok) {
-                    statusBadge.innerText = "SERVER ONLINE";
-                    statusBadge.className = "status-badge status-online";
+                // 1. Fetch URL from Relay
+                const response = await fetch(RELAY_URL);
+                const data = await response.json();
+
+                if (data.url && data.url.startsWith("http")) {
+                    const candidateUrl = data.url.replace(/\/$/, "");
+                    await checkServerHealth(candidateUrl);
                 } else {
-                    throw new Error("Server Error");
+                    throw new Error("No active server found in registry.");
                 }
-            } catch(e) {
-                statusBadge.innerText = "SERVER OFFLINE";
-                statusBadge.className = "status-badge status-offline";
+            } catch (error) {
+                console.error(error);
+                handleConnectionFail();
             }
         }
 
-        // --- Standard Logic Below ---
+        async function checkServerHealth(url) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+                
+                // Simple fetch to the home route
+                const res = await fetch(`${url}/`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if(res.ok) {
+                    apiUrlInput.value = url; 
+                    statusBadge.innerText = "SYSTEM ONLINE";
+                    statusBadge.className = "status-badge status-online";
+                    
+                    activateBtn.innerHTML = '<i class="ph ph-wifi-high"></i> CONNECTED';
+                    activateBtn.classList.remove('pulsing');
+                    activateBtn.style.borderColor = '#065f46';
+                    activateBtn.style.color = '#34d399';
+                } else {
+                    throw new Error("Server returned error");
+                }
+            } catch(e) {
+                handleConnectionFail();
+            }
+        }
+
+        function handleConnectionFail() {
+            statusBadge.innerText = "SERVER OFFLINE";
+            statusBadge.className = "status-badge status-offline";
+            
+            activateBtn.disabled = false;
+            activateBtn.innerHTML = '<i class="ph ph-lightning-slash"></i> RETRY CONNECTION';
+            activateBtn.classList.remove('pulsing');
+            
+            alert("⚠️ Connection Failed.\n\nPlease ensure the Google Colab Notebook is running and has finished loading.");
+        }
+
+        // --- IMAGE PROCESSING LOGIC ---
+        let currentMode = 'simple';
+        let protectedBlob = null; 
+        const fileInput = document.getElementById('fileInput');
+        const immunizeBtn = document.getElementById('immunizeBtn');
+        const statusText = document.getElementById('statusText');
+        const dropZone = document.getElementById('dropZone');
 
         function selectShield(mode) {
             currentMode = mode;
@@ -192,7 +212,7 @@
         }
 
         function showLockMessage() {
-            alert("🔒 PRO FEATURE LOCKED\n\nTo keep Neuro Shield free, we use lightweight servers. 'Extreme Shield' requires massive NVIDIA H200 NVL GPU clusters.\n\nPlease support the project to unlock full server capacity!");
+            alert("🔒 PRO FEATURE LOCKED\n\nTo keep Neuro Shield free, we use lightweight servers. 'Extreme Shield' requires massive NVIDIA H200 NVL GPU clusters.");
         }
 
         dropZone.addEventListener('click', () => fileInput.click());
@@ -217,7 +237,13 @@
         async function processImage() {
             const file = fileInput.files[0];
             let baseUrl = apiUrlInput.value.replace(/\/$/, "");
-            if (!baseUrl || !file) return alert("Check Server URL and File.");
+            
+            if (!baseUrl) {
+                // Try to activate server if user forgot
+                alert("Please click 'ACTIVATE SERVER' first.");
+                return;
+            }
+            if (!file) return alert("Please upload a file.");
 
             immunizeBtn.disabled = true;
             document.getElementById('status').classList.remove('hidden');
