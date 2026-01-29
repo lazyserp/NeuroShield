@@ -11,12 +11,11 @@ import json
 import time
 
 # --- CONFIGURATION ---
-# 1. Your Npoint ID (The Signal Relay)
-SIGNAL_RELAY_ID = "267fff7f59144ba13252" 
+# 1. Npoint ID (The Signal Relay)
+SIGNAL_RELAY_ID = "267fff7f59144ba13252"
 
 # 2. Ngrok Token Setup
-#    We try to get it from Colab Secrets first, then fallback to manual input
-MANUAL_TOKEN = "" 
+MANUAL_TOKEN = "38IbuxA2pmfcRlrp9JnjBynPGQE_4cBy8bJL8THanYZaedegT"
 
 # --- 1. ROBUST INSTALLER ---
 def install_packages():
@@ -61,7 +60,7 @@ def update_signal_relay(public_url):
     if "YOUR_NPOINT_ID" in SIGNAL_RELAY_ID:
         print("⚠️ Signal Relay ID not set. Frontend won't find this server.")
         return
-    
+
     print(f"📡 Updating Signal Relay ({SIGNAL_RELAY_ID})...")
     try:
         url = f"https://api.npoint.io/{SIGNAL_RELAY_ID}"
@@ -144,21 +143,21 @@ def attack_extreme(pipe, image_tensor, steps=20, eps=0.04):
     for i in range(steps):
         torch.set_grad_enabled(True)
         X_adv.requires_grad_(True)
-        
+
         latents = pipe.vae.encode(X_adv).latent_dist.sample() * 0.18215
         noise = torch.randn_like(latents)
         timesteps = torch.tensor([500], device=device)
         noisy_latents = pipe.scheduler.add_noise(latents, noise, timesteps)
-        
+
         batch_size = latents.shape[0]
         mask = torch.zeros((batch_size, 1, latents.shape[2], latents.shape[3]), device=device, dtype=latents.dtype)
-        masked_latents = latents 
+        masked_latents = latents
         latent_model_input = torch.cat([noisy_latents, mask, masked_latents], dim=1)
-        
+
         noise_pred = pipe.unet(latent_model_input, timesteps, encoder_hidden_states=torch.zeros((1, 77, 768), device=device).half())[0]
         loss = (X_adv - target_image).norm()
         grad = torch.autograd.grad(loss, [X_adv])[0]
-        
+
         X_adv = X_adv - step_size * grad.sign()
         X_adv = torch.minimum(torch.maximum(X_adv, image_tensor - eps), image_tensor + eps)
         X_adv.data = torch.clamp(X_adv, min=-1, max=1)
