@@ -38,9 +38,7 @@
             <i class="ph ph-warning-circle" style="font-size: 1.2rem;"></i>
             <div>
                  The GPU server enters sleep mode to save costs. 
-                 <br>Please run this Collab Notebook 👉: <a href="https://colab.research.google.com/drive/1HE_ivvTYoNtJ0U4E6Ifmm9Dj0_DwHwi5" target="_blank"> <strong>Notebook</strong> </a> 
-                <br>then Click 'Activate Server' below to wake the connection & wait until the output(below the notebook code) says : Signal Relay Updated! Frontend can now auto-connect.
-                 
+                <br>Click 'Activate Server' below to wake the connection & wait until the status changes.
             </div>
         </div>
 
@@ -129,9 +127,10 @@
     </div>
 
     <script>
-        // --- AUTO-CONNECTION LOGIC ---
-        const SIGNAL_RELAY_ID = "610119f7e28feb022a80"; 
-        const RELAY_URL = `https://api.npoint.io/${SIGNAL_RELAY_ID}`;
+        // --- AUTO-CONNECTION LOGIC (JSONBIN) ---
+        const BIN_ID = "697b7ad243b1c97be9551c19"; 
+        const API_KEY = "$2a$10$5BvU.cz6cenJq/JHJPeDOuXpUEyCyG0hnW4KrBifrKeg9R1Nd3nP2";
+        const RELAY_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
         const activateBtn = document.getElementById('activateBtn');
         const statusBadge = document.getElementById('serverStatusBadge');
@@ -145,15 +144,27 @@
             statusBadge.innerText = "SEARCHING SIGNAL...";
 
             try {
-                // 1. Fetch URL from Relay
-                const response = await fetch(RELAY_URL);
-                const data = await response.json();
+                // 1. Fetch URL from JSONBin
+                const response = await fetch(RELAY_URL, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': API_KEY, // Auth Header
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) throw new Error(`JSONBin Error: ${response.status}`);
 
-                if (data.url && data.url.startsWith("http")) {
-                    const candidateUrl = data.url.replace(/\/$/, "");
+                const data = await response.json();
+                
+                // JSONBin wraps the actual data in a 'record' object
+                const serverUrl = data.record.url; 
+
+                if (serverUrl && serverUrl.startsWith("http")) {
+                    const candidateUrl = serverUrl.replace(/\/$/, "");
                     await checkServerHealth(candidateUrl);
                 } else {
-                    throw new Error("No active server found in registry.");
+                    throw new Error("No active server URL found in bin.");
                 }
             } catch (error) {
                 console.error(error);
@@ -166,8 +177,12 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
                 
-                // Simple fetch to the home route
-                const res = await fetch(`${url}/`, { signal: controller.signal });
+                // Add header to bypass ngrok warning page
+                const res = await fetch(`${url}/`, { 
+                    signal: controller.signal,
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                
                 clearTimeout(timeoutId);
 
                 if(res.ok) {
@@ -242,7 +257,7 @@
             
             if (!baseUrl) {
                 // Try to activate server if user forgot
-                alert("Please click 'ACTIVATE SERVER' first.");
+                activateServer();
                 return;
             }
             if (!file) return alert("Please upload a file.");
@@ -259,7 +274,11 @@
             formData.append("mode", "simple"); 
 
             try {
-                const response = await fetch(`${baseUrl}/immunize`, { method: "POST", body: formData });
+                const response = await fetch(`${baseUrl}/immunize`, { 
+                    method: "POST", 
+                    body: formData,
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (!response.ok) throw new Error("Processing Failed");
 
                 protectedBlob = await response.blob();
@@ -295,7 +314,11 @@
             formData.append("prompt", prompt);
 
             try {
-                const response = await fetch(`${baseUrl}/verify`, { method: "POST", body: formData });
+                const response = await fetch(`${baseUrl}/verify`, { 
+                    method: "POST", 
+                    body: formData,
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 if (!response.ok) throw new Error("Verification Failed");
 
                 const blob = await response.blob();
